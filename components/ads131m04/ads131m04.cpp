@@ -177,22 +177,37 @@ uint16_t ADS131M04::readRegister(uint8_t address) {
 
   cmd = CMD_READ_REG | (address << 7 | 0);
 
-  this->cs_->digital_write(false);
+  this->cs_->digital_write(false); // Replace digitalWrite(ADS131M04_CS_PIN, LOW)
   delayMicroseconds(1);
 
-  uint8_t tx_buffer[13];
-  uint8_t rx_buffer[13];
+  // Send the command (16 bits)
+  uint8_t cmd_high = (cmd >> 8) & 0xFF;
+  uint8_t cmd_low = cmd & 0xFF;
+  this->write_byte(cmd_high);
+  this->write_byte(cmd_low);
+  this->write_byte(0x00); // Send the extra byte
 
-  tx_buffer[0] = (cmd >> 8) & 0xFF;
-  tx_buffer[1] = cmd & 0xFF;
-  for (int i=2; i<13; i++){
-    tx_buffer[i] = 0x00;
+  // Send 16 bits of 0x0000 followed by 1 byte of 0x00, 6 times
+  for (int i = 0; i < 6; i++) {
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+    this->write_byte(0x00);
   }
-  this->transfer(tx_buffer, rx_buffer, 13); // Corrected: Use spi_bus_->transfer()
-  data = ((uint16_t)rx_buffer[7] << 8) | rx_buffer[8];
 
-  delayMicroseconds(1);
-  this->cs_->digital_write(true);
+  // Read the 16 bits of data
+  uint8_t data_high = this->read_byte();
+  uint8_t data_low = this->read_byte();
+  data = (data_high << 8) | data_low;
+  this->read_byte(); // Read the extra byte
+
+  // Send 16 bits of 0x0000 followed by 1 byte of 0x00, 6 times
+  for (int i = 0; i < 6; i++) {
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+  }
+
+  this->cs_->digital_write(true); // Replace digitalWrite(ADS131M04_CS_PIN, HIGH)
   return data;
 }
 
