@@ -9,24 +9,7 @@
 namespace esphome {
 namespace ads131m04 {
 
-struct adcOutput { // ADC output converted from two's complement
-  uint16_t status;
-  int32_t ch0;
-  int32_t ch1;
-  int32_t ch2;
-  int32_t ch3;
-};
-
-struct adcOutputraw { // ADC output in two's complement
-  uint16_t status;
-  uint32_t ch0;
-  uint32_t ch1;
-  uint32_t ch2;
-  uint32_t ch3;
-};
-
 #define SPIfreq 8000000 // 8 Mhz SPI
-
 #define DRDY_STATE_LOGIC_HIGH 0 // DEFAULS
 #define DRDY_STATE_HI_Z 1
 
