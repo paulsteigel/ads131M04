@@ -1,5 +1,4 @@
 #include "ads131m04_sensor.h"
-
 #include "esphome/core/log.h"
 
 namespace esphome {
@@ -9,12 +8,12 @@ static const char *const TAG = "ads131m04.sensor";
 
 void ADS131M04Sensor::dump_config() {
   LOG_SENSOR("  ", "ADS131M04 Sensor", this);
-  ESP_LOGCONFIG(TAG, "    Multiplexer: %u", this->multiplexer_);
+  ESP_LOGCONFIG(TAG, "    Channel: %u", this->channel_);
   ESP_LOGCONFIG(TAG, "    Gain: %u", this->gain_);
 }
 
 float ADS131M04Sensor::sample() {
-  return this->parent_->request_measurement(this->multiplexer_, this->gain_, this->temperature_mode_);
+  return this->parent_->request_measurement(this->channel_, this->gain_);
 }
 
 void ADS131M04Sensor::update() {
