@@ -13,8 +13,33 @@ void ADS131M04Sensor::dump_config() {
   ESP_LOGCONFIG(TAG, "    Gain: %u", this->gain_);
 }
 
+/* old 1118 code
 float ADS131M04Sensor::sample() {
   //return this->parent_->readADC(this->multiplexer_, this->gain_, this->temperature_mode_);
+}
+*/
+float ADS131M04Sensor::sample() {
+  adcOutput res = this->parent_->readADC();
+  float voltage = 0.0f;
+
+  switch (sensor_num_) {
+    case 1:
+      voltage = this->parent_->convert(res.ch0, gain_);
+      break;
+    case 2:
+      voltage = this->parent_->convert(res.ch1, gain_);
+      break;
+    case 3:
+      voltage = this->parent_->convert(res.ch2, gain_);
+      break;
+    case 4:
+      voltage = this->parent_->convert(res.ch3, gain_);
+      break;
+    default:
+      ESP_LOGE(TAG, "Invalid sensor number: %u", sensor_num_);
+      return NAN;
+  }
+  return voltage;
 }
 
 void ADS131M04Sensor::update() {
