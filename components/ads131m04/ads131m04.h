@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esphome/core/component.h"
+#include "esphome/core/preferences.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/spi/spi.h"
 
@@ -24,7 +25,7 @@ static const uint8_t ADS131M04_REG_CLOCK = 0x03;
 // Register values
 static const uint16_t ADS131M04_MODE_CONTINUOUS = 0x0100;
 
-class ADS131M04Component : public esphome::PollingComponent, public esphome::spi::SPIDevice {
+class ADS131M04Component : public Component, public spi::SPIDevice {
  public:
   void setup() override;
   void dump_config() override;
