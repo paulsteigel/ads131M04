@@ -327,8 +327,8 @@ public:
   float get_setup_priority() const override { return setup_priority::DATA; }
   
   /// Helper method to request a measurement from a sensor.
-  float request_measurement(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode);
-  float request_measurementX(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode);
+  float request_measurement(ADS131M04Gain gain, bool temperature_mode);
+  float request_measurementX(ADS131M04Gain gain, bool temperature_mode);
   
   //void set_num_ac_channels(int num_ac_channels) { num_ac_channels_ = num_ac_channels; }
   void set_data_ready_pin(GPIOPin *data_ready_pin) { this->data_ready_pin_ = data_ready_pin; }  
