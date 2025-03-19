@@ -108,7 +108,7 @@ void ADS131M04::dump_config() {
   LOG_PIN("  DRDY Pin:", this->data_ready_pin_);
   LOG_PIN("  RESET Pin:", this->reset_pin_);
 }
-
+/*
 float ADS131M04::request_measurement(ADS131M04Gain gain, bool temperature_mode) {
   uint16_t temp_config = this->config_;
   
@@ -242,6 +242,7 @@ float ADS131M04::request_measurementX(ADS131M04Gain gain, bool temperature_mode)
     return millivolts / 1e3f;
   }
 }
+*/
 
 uint16_t ADS131M04::readRegister(uint8_t address) {
   uint16_t cmd;
