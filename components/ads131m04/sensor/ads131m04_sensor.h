@@ -31,7 +31,7 @@ ADS131M04Sensor(ADS131M04 *parent, uint8_t sensor_num, std::string multiplexer, 
         multiplexer_(multiplexer),
         gain_(gain) {}
 */
-  void set_multiplexer(ADS1118Multiplexer multiplexer) { this->multiplexer_ = multiplexer; }  
+  //void set_multiplexer(ADS1118Multiplexer multiplexer) { this->multiplexer_ = multiplexer; }  
   void update() override;
   float sample(); // Removed 'override'
   void dump_config() override;
