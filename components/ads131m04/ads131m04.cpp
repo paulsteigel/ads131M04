@@ -1,5 +1,6 @@
 #include "ads131m04.h"
 #include "esphome/core/log.h"
+#include "sensor/ads131m04_sensor.h"
 //#include "sensor/ads131m04_sensor.h" // Include the sensor header file
 //#include "esphome/core/helpers.h" // For encoding and decoding functions
 //#include "esphome/components/gpio/gpio.h" // For GPIO pin handling
