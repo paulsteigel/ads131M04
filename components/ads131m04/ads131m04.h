@@ -298,8 +298,6 @@ public:
   float request_measurement(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode);
   
   //void set_num_ac_channels(int num_ac_channels) { num_ac_channels_ = num_ac_channels; }
-  //void set_data_ready_pin(uint8_t data_ready_pin) { data_ready_pin_ = data_ready_pin; }
-  //void set_reset_pin(uint8_t reset_pin) { reset_pin_ = reset_pin; }      
   void set_data_ready_pin(GPIOPin *data_ready_pin) { this->data_ready_pin_ = data_ready_pin; }  
   void set_reset_pin(GPIOPin *reset_pin) { this->reset_pin_ = reset_pin; }  
     
@@ -335,7 +333,7 @@ protected:
   //uint8_t reset_pin_ = 0;
 
 private:
-    uint16_t readRegister(uint8_t address);
+    //uint16_t readRegister(uint8_t address);
     uint8_t writeRegister(uint8_t address, uint16_t value);
     void writeRegisterMasked(uint8_t address, uint16_t value, uint16_t mask);
 };
