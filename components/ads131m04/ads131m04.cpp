@@ -14,16 +14,15 @@ void ADS131M04::setup() {
 
 /////////////////////
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04");
-  /*
-  this->spi_bus_ = new spi::SPIBus(this->clk_pin_, this->sdi_pin_, this->sdo_pin_); // NOLINT
+  this->spi_setup();
+  this->spi_bus_ = new spi::SPIBus(this->clk_pin_, this->sdi_pin_, this->sdo_pin_);
   this->clk_pin_->setup();
   this->clk_pin_->digital_write(true);
   this->sdo_pin_->setup();
   this->sdi_pin_->setup();
-
   this->cs_->setup();
   this->cs_->digital_write(true);
-  */
+  
   this->spi_setup();
   
   // Reset Pin Setup   
