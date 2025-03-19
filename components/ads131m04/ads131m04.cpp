@@ -425,6 +425,114 @@ bool ADS131M04::setChannelOffsetCalibration(uint8_t channel, int32_t offset) {
   }
   return returnval;
 }
+adcOutput ADS131M04::readADC(void) {
+  uint8_t x = 0;
+  uint8_t x2 = 0;
+  uint8_t x3 = 0;
+  int32_t aux;
+  adcOutput res;
+
+  this->cs_->digital_write(false); // Replace digitalWrite(ADS131M04_CS_PIN, LOW)
+  delayMicroseconds(1);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  this->read_byte(); // Discard extra byte
+
+  res.status = ((x << 8) | x2);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  aux = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+  aux = twoscom(aux);
+  res.ch0 = aux;
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  aux = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+  aux = twoscom(aux);
+  res.ch1 = aux;
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  aux = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+  aux = twoscom(aux);
+  res.ch2 = aux;
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  aux = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+  aux = twoscom(aux);
+  res.ch3 = aux;
+
+  // CRC
+  this->read_byte();
+  this->read_byte();
+  this->read_byte();
+
+  delayMicroseconds(1);
+  this->cs_->digital_write(true); // Replace digitalWrite(ADS131M04_CS_PIN, HIGH)
+
+  return res;
+}
+
+adcOutputraw ADS131M04::readADCraw(void) {
+  uint8_t x = 0;
+  uint8_t x2 = 0;
+  uint8_t x3 = 0;
+  adcOutputraw res;
+
+  this->cs_->digital_write(false); // Replace digitalWrite(ADS131M04_CS_PIN, LOW)
+  delayMicroseconds(1);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  this->read_byte(); // Discard extra byte
+
+  res.status = ((x << 8) | x2);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  res.ch0 = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  res.ch1 = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  res.ch2 = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+
+  x = this->read_byte();
+  x2 = this->read_byte();
+  x3 = this->read_byte();
+
+  res.ch3 = (((x << 16) | (x2 << 8) | x3) & 0x00FFFFFF);
+
+  // CRC
+  this->read_byte();
+  this->read_byte();
+  this->read_byte();
+
+  delayMicroseconds(1);
+  this->cs_->digital_write(true); // Replace digitalWrite(ADS131M04_CS_PIN, HIGH)
+
+  return res;
+}
 
 }  // namespace ads131m04
 }  // namespace esphome
