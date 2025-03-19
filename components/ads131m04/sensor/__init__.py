@@ -59,4 +59,4 @@ async def to_code(config):
     await cg.register_parented(var, config[CONF_ADS131M04_ID])
 
     if CONF_GAIN in config:
-        cg.add(parent.set_gain(config[CONF_GAIN]))
+        cg.add(var.set_gain(config[CONF_GAIN]))
