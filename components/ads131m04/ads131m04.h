@@ -3,8 +3,7 @@
 #include "esphome/components/spi/spi.h"
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
-//#include "esphome/components/gpio/gpio.h"
-//#include "esphome/core/log.h"
+#include <vector> // Include vector header
 
 namespace esphome {
 namespace ads131m04 {
@@ -335,6 +334,7 @@ public:
   void set_reset_pin(GPIOPin *reset_pin) { this->reset_pin_ = reset_pin; }  
   // Prototype for set_gain()
   void set_gain(ADS131M04Gain gain);
+  void add_sensor(class ADS131M04Sensor *sensor) { this->sensors_.push_back(sensor); }
 
   //void begin(uint8_t clk_pin, uint8_t miso_pin, uint8_t mosi_pin, uint8_t cs_pin, uint8_t drdy_pin, uint8_t reset_pin);
   int8_t isDataReadySoft(byte channel);
@@ -365,6 +365,7 @@ protected:
   GPIOPin *data_ready_pin_{nullptr};  
   GPIOPin *reset_pin_{nullptr};
   ADS131M04Gain gain_; // Declare gain_ here
+  std::vector<class ADS131M04Sensor *> sensors_; // Declare sensors_ here
 
 private:
     //uint16_t readRegister(uint8_t address);
