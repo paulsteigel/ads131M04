@@ -14,9 +14,10 @@ void ADS131M04::setup() {
 
 /////////////////////
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04");
-  this->spi_setup(); 
-  // Reset Pin Setup
-  if (this->reset_pin_ != 0) {
+  this->spi_setup();
+  
+  // Reset Pin Setup   
+  if (this->reset_pin_ != nullptr) {
       this->reset_pin_->setup();
       this->reset_pin_->digital_write(true); // Initial high state
       delay(10);
@@ -27,7 +28,7 @@ void ADS131M04::setup() {
   }
 
   // DRDY Pin Setup
-  if (this->data_ready_pin_ != 0) {
+  if (this->data_ready_pin_ != nullptr) {
       this->data_ready_pin_->setup();
   }
 
