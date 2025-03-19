@@ -15,6 +15,17 @@ CONF_RESET_PIN = "reset_pin"
 ads131m04_ns = cg.esphome_ns.namespace("ads131m04")
 ADS131M04 = ads131m04_ns.class_("ADS131M04", cg.Component, spi.SPIDevice)
 
+GAIN = {
+    1: ADS131M04Gain.ADS131M04_GAIN_1,
+    2: ADS131M04Gain.ADS131M04_GAIN_2,
+    4: ADS131M04Gain.ADS131M04_GAIN_4,
+    8: ADS131M04Gain.ADS131M04_GAIN_8,
+    16: ADS131M04Gain.ADS131M04_GAIN_16,
+    32: ADS131M04Gain.ADS131M04_GAIN_32,
+    64: ADS131M04Gain.ADS131M04_GAIN_64,
+    128: ADS131M04Gain.ADS131M04_GAIN_128,
+}
+
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(ADS131M04),
