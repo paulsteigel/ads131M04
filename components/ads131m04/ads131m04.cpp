@@ -167,7 +167,7 @@ uint16_t ADS131M04::readRegister(uint8_t address) {
 
   cmd = CMD_READ_REG | (address << 7 | 0);
 
-  digitalWrite(this->cs_, LOW);
+  this->cs_->digital_write(false); // Corrected: Use GPIOPin's digital_write()
   delayMicroseconds(1);
 
   uint8_t tx_buffer[13];
@@ -182,7 +182,7 @@ uint16_t ADS131M04::readRegister(uint8_t address) {
   data = ((uint16_t)rx_buffer[7] << 8) | rx_buffer[8];
 
   delayMicroseconds(1);
-  digitalWrite(this->cs_, HIGH);
+  this->cs_->digital_write(true); // Corrected: Use GPIOPin's digital_write()
   return data;
 }
 
