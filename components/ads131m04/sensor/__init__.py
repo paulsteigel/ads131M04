@@ -54,9 +54,9 @@ CONFIG_SCHEMA = cv.typed_schema(
 )
 
 async def to_code(config):
-    parent = await cg.get_variable(config[CONF_ADS131M04_ID])
-    if CONF_GAIN in config:
-        cg.add(parent.set_gain(config[CONF_GAIN]))
     var = await sensor.new_sensor(config)
     await cg.register_component(var, config)
     await cg.register_parented(var, config[CONF_ADS131M04_ID])
+
+    if CONF_GAIN in config:
+        cg.add(parent.set_gain(config[CONF_GAIN]))
