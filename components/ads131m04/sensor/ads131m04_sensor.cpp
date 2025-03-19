@@ -1,29 +1,23 @@
 #include "ads131m04_sensor.h"
-
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace ads131m04 {
+namespace ads131m04_sensor {
 
-static const char *const TAG = "ads131m04.sensor";
-
-void ADS131M04Sensor::dump_config() {
-  LOG_SENSOR("  ", "ADS131M04 Sensor", this);
-  ESP_LOGCONFIG(TAG, "    Multiplexer: %u", this->multiplexer_);
-  ESP_LOGCONFIG(TAG, "    Gain: %u", this->gain_);
-}
-
-float ADS131M04Sensor::sample() {
-  return this->parent_->request_measurement(this->multiplexer_, this->gain_, this->temperature_mode_);
-}
+static const char *const TAG = "ads131m04_sensor";
 
 void ADS131M04Sensor::update() {
-  float v = this->sample();
-  if (!std::isnan(v)) {
-    ESP_LOGD(TAG, "'%s': Got Voltage=%fV", this->get_name().c_str(), v);
-    this->publish_state(v);
+  if (this->parent_->data_ready_) {
+    if (this->channel_ >= 1 && this->channel_ <= 4) {
+      if (this->is_voltage_) {
+        this->publish_state(this->parent_->voltages_[this->channel_ - 1]);
+      } else {
+        this->publish_state(this->parent_->currents_[this->channel_ - 1]);
+      }
+    }
+    this->parent_->data_ready_ = false;
   }
 }
 
-}  // namespace ads131m04
-}  // namespace esphome
+} // namespace ads131m04_sensor
+} // namespace esphome
