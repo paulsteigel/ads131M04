@@ -5,8 +5,6 @@ from esphome.const import (
     CONF_ID,
     CONF_SPI_ID,
     CONF_CS_PIN,
-    CONF_DATA_READY_PIN,
-    CONF_RESET_PIN,
     CONF_GAIN,
     CONF_UPDATE_INTERVAL,
     UNIT_VOLT,
@@ -47,8 +45,6 @@ CONFIG_SCHEMA = (
             cv.GenerateID(): cv.declare_id(ADS131M04),
             cv.GenerateID(CONF_SPI_ID): cv.use_id(spi.SPIDevice),
             cv.Required(CONF_CS_PIN): gpio.output_pin_schema,
-            cv.Optional(CONF_DATA_READY_PIN): gpio.input_pin_schema,
-            cv.Optional(CONF_RESET_PIN): gpio.output_pin_schema,
         }
     )
     .extend(cv.polling_component_schema("60s"))
@@ -79,12 +75,6 @@ async def to_code(config):
     if CONF_CS_PIN in config:
         pin = await cg.gpio_pin_expression(config[CONF_CS_PIN])
         cg.add(var.set_cs_pin(pin))
-    if CONF_DATA_READY_PIN in config:
-        pin = await cg.gpio_pin_expression(config[CONF_DATA_READY_PIN])
-        cg.add(var.set_data_ready_pin(pin))
-    if CONF_RESET_PIN in config:
-        pin = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
-        cg.add(var.set_reset_pin(pin))
 
 async def to_code_sensor(config):
     var = cg.new_Pvariable(config[CONF_ID], template_args=(cg.RawExpression("float"),))
