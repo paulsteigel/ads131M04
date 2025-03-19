@@ -27,29 +27,17 @@ DEPENDENCIES = ["ads131m04"]
 #     # ... (other multiplexer options) ...
 # }
 
-ADS131M04Gain = ads131m04_ns.enum("ADS131M04Gain") # Corrected namespace
+ADS131M04Gain = ads131m04_ns.enum("ADS131M04Gain")
 GAIN = {
-    "1": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_1, # Corrected namespace
-    "2": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_2, # Corrected namespace
-    "4": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_4, # Corrected namespace
-    "8": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_8, # Corrected namespace
-    "16": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_16, # Corrected namespace
-    "32": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_32, # Corrected namespace
-    "64": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_64, # Corrected namespace
-    "128": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_128, # Corrected namespace
+    "1": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_1,
+    "2": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_2,
+    "4": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_4,
+    "8": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_8,
+    "16": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_16,
+    "32": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_32,
+    "64": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_64,
+    "128": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_128,
 }
-
-#ADS131M04Gain = ads131m04_ns.enum("ADS131M04Gain")
-#GAIN = {
-#    "1": ADS131M04Gain.ADS131M04_GAIN_1,
-#    "2": ADS131M04Gain.ADS131M04_GAIN_2,
-#    "4": ADS131M04Gain.ADS131M04_GAIN_4,
-#    "8": ADS131m04Gain.ADS131M04_GAIN_8,
-#    "16": ADS131M04Gain.ADS131M04_GAIN_16,
-#    "32": ADS131M04Gain.ADS131M04_GAIN_32,
-#    "64": ADS131M04Gain.ADS131M04_GAIN_64,
-#    "128": ADS131M04Gain.ADS131M04_GAIN_128,
-#}
 
 ADS131M04Sensor = ads131m04_ns.class_(
     "ADS131M04Sensor",
