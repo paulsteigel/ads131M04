@@ -10,6 +10,7 @@ static const char *const TAG = "ads131m04.sensor";
 void ADS131M04Sensor::dump_config() {
   LOG_SENSOR("  ", "ADS131M04 Sensor", this);
   ESP_LOGCONFIG(TAG, "    Gain: %u", this->gain_);
+  //ESP_LOGCONFIG(TAG, "    Gain: %u", static_cast<uint8_t>(this->gain_));
 }
 
 float ADS131M04Sensor::sample() {
@@ -44,6 +45,10 @@ void ADS131M04Sensor::update() {
     ESP_LOGD(TAG, "'%s': Got Voltage=%fV", this->get_name().c_str(), v);
     this->publish_state(v);
   }
+}
+
+void ADS131M04Sensor::set_channel(uint8_t channel) {
+  this->channel_ = channel;
 }
 
 }  // namespace ads131m04
