@@ -2,8 +2,10 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
-#include "esphome/components/spi/spi.h"
+#include "esphome/core/log.h"
+#include "esphome/core/polling_component.h"
 #include "esphome/components/sensor/sensor.h"
+#include "esphome/components/spi/spi.h"
 
 namespace esphome {
 namespace ads131m04 {
@@ -25,7 +27,7 @@ static const uint8_t ADS131M04_REG_CLOCK = 0x03;
 // Register values
 static const uint16_t ADS131M04_MODE_CONTINUOUS = 0x0100;
 
-class ADS131M04Component : public Component, public spi::SPIDevice {
+class ADS131M04Component : public PollingComponent, public spi::SPIDevice {
  public:
   void setup() override;
   void dump_config() override;
