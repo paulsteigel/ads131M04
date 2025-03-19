@@ -500,5 +500,22 @@ int32_t ADS131M04::revconvert(float datain, ADS131M04Gain gain) {
   return out;
 }
 
+// Fast two's complement (C++ version)
+int32_t ADS131M04::twoscom(int32_t datain) {
+  int32_t dataout;
+  if ((datain >> 23) & 1) { // Check bit 23 using bitwise shift and AND
+    dataout = datain - 16777216;
+  } else {
+    dataout = datain;
+  }
+  return dataout;
+}
+
+// Convert signed 32-bit values to 24-bit two's complement
+int32_t ADS131M04::revtwoscom(int32_t datain) {
+  int32_t dataout = datain & 0xFFFFFF;
+  return dataout;
+}
+
 }  // namespace ads131m04
 }  // namespace esphome
