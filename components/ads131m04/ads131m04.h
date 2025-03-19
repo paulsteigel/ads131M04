@@ -294,8 +294,10 @@ public:
 
 protected:
   uint16_t config_{0};
-  uint8_t data_ready_pin_ = 0;
-  uint8_t reset_pin_ = 0;
+  GPIOPin *data_ready_pin_{nullptr};  
+  GPIOPin *reset_pin_{nullptr};  
+  //uint8_t data_ready_pin_ = 0;
+  //uint8_t reset_pin_ = 0;
 
 private:
     uint16_t readRegister(uint8_t address);
