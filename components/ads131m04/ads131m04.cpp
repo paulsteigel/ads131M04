@@ -16,16 +16,6 @@ void ADS131M04::setup() {
 
 /////////////////////
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04");
-  /*
-  this->spi_setup();
-  this->spi_bus_ = new spi::SPIBus(this->clk_pin_, this->sdi_pin_, this->sdo_pin_);
-  this->clk_pin_->setup();
-  this->clk_pin_->digital_write(true);
-  this->sdo_pin_->setup();
-  this->sdi_pin_->setup();
-  this->cs_->setup();
-  this->cs_->digital_write(true);
-  */
   this->spi_setup();
   
   // Reset Pin Setup   
@@ -39,15 +29,14 @@ void ADS131M04::setup() {
       delay(10);
   }
   // Set channel for sensor
-  for (uint8_t i = 0; i < this->sensors_.size(); i++) {
-    this->sensors_[i]->set_channel(i);
-  }
+  //for (uint8_t i = 0; i < this->sensors_.size(); i++) {
+  //  this->sensors_[i]->set_channel(i);
+  //}
   
   // DRDY Pin Setup
   if (this->data_ready_pin_ != nullptr) {
       this->data_ready_pin_->setup();
   }
-
 
   // Example: Set OSR
   setOsr(OSR_1024);
