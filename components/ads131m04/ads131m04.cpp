@@ -167,7 +167,7 @@ uint16_t ADS131M04::readRegister(uint8_t address) {
 
   cmd = CMD_READ_REG | (address << 7 | 0);
 
-  this->cs_->digital_write(false); // Corrected: Use GPIOPin's digital_write()
+  this->cs_->digital_write(false);
   delayMicroseconds(1);
 
   uint8_t tx_buffer[13];
@@ -178,11 +178,11 @@ uint16_t ADS131M04::readRegister(uint8_t address) {
   for (int i=2; i<13; i++){
     tx_buffer[i] = 0x00;
   }
-  this->transfer(tx_buffer, rx_buffer, 13);
+  this->transfer(tx_buffer, rx_buffer, 13); // Corrected: Use spi::SPIDevice::transfer()
   data = ((uint16_t)rx_buffer[7] << 8) | rx_buffer[8];
 
   delayMicroseconds(1);
-  this->cs_->digital_write(true); // Corrected: Use GPIOPin's digital_write()
+  this->cs_->digital_write(true);
   return data;
 }
 
