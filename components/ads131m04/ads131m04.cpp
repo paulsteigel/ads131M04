@@ -8,6 +8,7 @@ static const char *const TAG = "ads131m04";
 
 void ADS131M04::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04...");
+  this->spi_setup();
 
   // Read and verify device ID
   uint16_t id = this->read_register_(ADS131M04_REG_ID);
@@ -18,43 +19,50 @@ void ADS131M04::setup() {
     this->mark_failed();
     return;
   }
+
+  // Configure device for continuous conversion
+  if (!this->write_register_(ADS131M04_REG_MODE, ADS131M04_MODE_CONTINUOUS)) {
+    ESP_LOGE(TAG, "Failed to configure MODE register");
+    this->mark_failed();
+    return;
+  }
 }
 
 void ADS131M04::dump_config() {
   ESP_LOGCONFIG(TAG, "ADS131M04:");
+  LOG_PIN("  CS Pin:", this->cs_);
 
   if (this->is_failed()) {
     ESP_LOGE(TAG, "Communication failed!");
     return;
   }
-
-  for (int i = 0; i < 4; i++) {
-    if (this->voltage_sensors_[i] != nullptr || this->current_sensors_[i] != nullptr) {
-      ESP_LOGCONFIG(TAG, "  Channel %d:", i + 1);
-      if (this->voltage_sensors_[i] != nullptr)
-        ESP_LOGCONFIG(TAG, "    Voltage Sensor: YES");
-      if (this->current_sensors_[i] != nullptr)
-        ESP_LOGCONFIG(TAG, "    Current Sensor: YES");
-    }
-  }
 }
 
 bool ADS131M04::write_register_(uint8_t reg, uint16_t value) {
   this->enable();
+  delayMicroseconds(1);
+
+  // SPI frame structure from Pico implementation
   this->write_byte(0x40 | reg);  // Write command
   this->write_byte(0x00);        // Reserved
   this->write_byte((value >> 8) & 0xFF);
   this->write_byte(value & 0xFF);
+
+  delayMicroseconds(1);
   this->disable();
   return true;
 }
 
 uint16_t ADS131M04::read_register_(uint8_t reg) {
   this->enable();
+  delayMicroseconds(1);
+
   this->write_byte(0x20 | reg);  // Read command
   this->write_byte(0x00);        // Reserved
   uint8_t msb = this->read_byte();
   uint8_t lsb = this->read_byte();
+
+  delayMicroseconds(1);
   this->disable();
   return (msb << 8) | lsb;
 }
@@ -63,25 +71,45 @@ void ADS131M04::read_data_() {
   uint8_t data[16];  // 4 bytes per channel
 
   this->enable();
+  delayMicroseconds(1);
+
+  // Send NULL command to read data
   this->write_byte(ADS131M04_NULL_CMD >> 8);
   this->write_byte(ADS131M04_NULL_CMD & 0xFF);
-  this->read_array(data, 16);
+
+  // Status word - 2 bytes
+  uint8_t status_msb = this->read_byte();
+  uint8_t status_lsb = this->read_byte();
+  uint16_t status = (status_msb << 8) | status_lsb;
+
+  // Read channel data (4 bytes per channel)
+  for (int i = 0; i < 4; i++) {
+    data[i*4] = this->read_byte();
+    data[i*4+1] = this->read_byte();
+    data[i*4+2] = this->read_byte();
+    data[i*4+3] = this->read_byte();
+  }
+
+  delayMicroseconds(1);
   this->disable();
 
   // Process channel data
   for (int i = 0; i < 4; i++) {
     int32_t raw_value = (data[i*4] << 24) | (data[i*4+1] << 16) | (data[i*4+2] << 8) | data[i*4+3];
 
+    // Two's complement conversion (if bit 23 is set)
+    if (raw_value & 0x800000) {
+      raw_value -= 0x1000000;
+    }
+
     if (this->voltage_sensors_[i] != nullptr) {
       float voltage = raw_value * VOLTAGE_SCALE;
       this->voltage_sensors_[i]->publish_state(voltage);
-      ESP_LOGV(TAG, "CH%d Voltage: %.6f V", i + 1, voltage);
     }
 
     if (this->current_sensors_[i] != nullptr) {
       float current = raw_value * CURRENT_SCALE;
       this->current_sensors_[i]->publish_state(current);
-      ESP_LOGV(TAG, "CH%d Current: %.6f A", i + 1, current);
     }
   }
 }
