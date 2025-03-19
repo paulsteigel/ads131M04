@@ -2,9 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
-
 #include "esphome/components/sensor/sensor.h"
-
 #include "../ads131m04.h"
 
 namespace esphome {
@@ -20,11 +18,12 @@ public:
   void dump_config() override;
   void set_gain(ADS131M04Gain gain) { this->gain_ = gain; }
   ADS131M04Gain get_gain() { return this->gain_; }
+  void set_channel(uint8_t channel);
 
 protected:
   /** Gain setting (string). */
-  //std::string gain_;
   ADS131M04Gain gain_;
+  uint8_t channel_; // Add channel_ member variable
 };
 
 }  // namespace ads131m04
