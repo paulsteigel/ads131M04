@@ -298,16 +298,10 @@ bool ADS131M04::command(uint16_t cmd) {
 }
 
 bool ADS131M04::isDataReady() {
-  if (this->data_ready_pin_ == 0) {
-    ESP_LOGW(TAG, "Data ready pin not configured.");
+  if (this->data_ready_pin_->digital_read()) { // Replace digitalRead(ADS131M04_DRDY_PIN) == HIGH
     return false;
   }
-  auto drdy_pin = gpio_pin_expression(this->data_ready_pin_);
-  if (drdy_pin == nullptr){
-    ESP_LOGW(TAG, "Data ready pin is nullptr.");
-    return false;
-  }
-  return drdy_pin->digital_read() == false; // DRDY is low when data is ready
+  return true;
 }
 
 int8_t ADS131M04::isDataReadySoft(uint8_t channel) {
