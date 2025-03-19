@@ -304,18 +304,10 @@ public:
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
   
-  /// Helper method to request a measurement from a sensor.
-  //float request_measurement(ADS131M04Gain gain, bool temperature_mode);
-  //float request_measurementX(ADS131M04Gain gain, bool temperature_mode);
-  
   //void set_num_ac_channels(int num_ac_channels) { num_ac_channels_ = num_ac_channels; }
   void set_data_ready_pin(GPIOPin *data_ready_pin) { this->data_ready_pin_ = data_ready_pin; }  
   void set_reset_pin(GPIOPin *reset_pin) { this->reset_pin_ = reset_pin; }  
-  // Prototype for set_gain()
-  //void set_gain(ADS131M04Gain gain);
-  //void add_sensor(class ADS131M04Sensor *sensor) { this->sensors_.push_back(sensor); }
-
-  //void begin(uint8_t clk_pin, uint8_t miso_pin, uint8_t mosi_pin, uint8_t cs_pin, uint8_t drdy_pin, uint8_t reset_pin);
+  
   int8_t isDataReadySoft(byte channel);
   bool isDataReady(void);
   bool isResetStatus(void);
@@ -343,8 +335,8 @@ protected:
   uint16_t config_{0};
   GPIOPin *data_ready_pin_{nullptr};  
   GPIOPin *reset_pin_{nullptr};
-  ADS131M04Gain gain_; // Declare gain_ here
-  std::vector<class ADS131M04Sensor *> sensors_; // Declare sensors_ here
+  //ADS131M04Gain gain_; // Declare gain_ here
+  //std::vector<class ADS131M04Sensor *> sensors_; // Declare sensors_ here
 
 private:
     //uint16_t readRegister(uint8_t address);
