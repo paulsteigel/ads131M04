@@ -5,114 +5,121 @@ namespace esphome {
 namespace ads131m04 {
 
 static const char *const TAG = "ads131m04";
+static const uint8_t ADS131M04_DATA_RATE_860_SPS = 0b111;
 
 void ADS131M04::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up ADS131M04...");
+  ESP_LOGCONFIG(TAG, "Setting up ads131m04");
   this->spi_setup();
 
-  // Read and verify device ID
-  uint16_t id = this->read_register_(ADS131M04_REG_ID);
-  ESP_LOGD(TAG, "Device ID: 0x%04X", id);
+  this->config_ = 0;
+  // Setup multiplexer
+  //        0bx000xxxxxxxxxxxx
+  this->config_ |= ADS131M04_MULTIPLEXER_P0_NG << 12;
 
-  // Unlock registers
-  this->write_register_(ADS131M04_UNLOCK, 0x0000);
+  // Setup Gain
+  //        0bxxxx000xxxxxxxxx
+  this->config_ |= ADS131M04_GAIN_6P144 << 9;
 
-  // Configure device for continuous conversion
-  this->write_register_(ADS131M04_REG_MODE, 0x0000);  // Continuous mode
+  // Set singleshot mode
+  //        0bxxxxxxx1xxxxxxxx
+  this->config_ |= 0b0000000100000000;
 
-  // Set gain and other default settings
-  this->write_register_(ADS131M04_REG_GAIN, 0x0000);  // Unity gain for all channels
+  // Set data rate - 860 samples per second (we're in singleshot mode)
+  //        0bxxxxxxxx100xxxxx
+  this->config_ |= ADS131M04_DATA_RATE_860_SPS << 5;
 
-  // Lock registers
-  this->write_register_(ADS131M04_LOCK, 0x0000);
+  // Set temperature sensor mode - ADC
+  //        0bxxxxxxxxxxx0xxxx
+  this->config_ |= 0b0000000000000000;
+
+  // Set DOUT pull up - enable
+  //        0bxxxxxxxxxxxx0xxx
+  this->config_ |= 0b0000000000001000;
+
+  // NOP - must be 01
+  //        0bxxxxxxxxxxxxx01x
+  this->config_ |= 0b0000000000000010;
+
+  // Not used - can be 0 or 1, lets be positive
+  //        0bxxxxxxxxxxxxxxx1
+  this->config_ |= 0b0000000000000001;
 }
 
 void ADS131M04::dump_config() {
   ESP_LOGCONFIG(TAG, "ADS131M04:");
-  LOG_PIN("  CS Pin: ", this->cs_);
+  LOG_PIN("  CS Pin:", this->cs_);
 }
 
-bool ADS131M04::write_register_(uint8_t reg, uint16_t value) {
-  this->enable();
-  delayMicroseconds(1);
+float ADS131M04::request_measurement(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode) {
+  uint16_t temp_config = this->config_;
+  // Multiplexer
+  //        0bxBBBxxxxxxxxxxxx
+  temp_config &= 0b1000111111111111;
+  temp_config |= (multiplexer & 0b111) << 12;
 
-  this->write_byte(0x40 | reg);  // Write command
-  this->write_byte(0x00);        // Reserved
-  this->write_byte((value >> 8) & 0xFF);
-  this->write_byte(value & 0xFF);
+  // Gain
+  //        0bxxxxBBBxxxxxxxxx
+  temp_config &= 0b1111000111111111;
+  temp_config |= (gain & 0b111) << 9;
 
-  delayMicroseconds(1);
-  this->disable();
-  return true;
-}
-
-uint16_t ADS131M04::read_register_(uint8_t reg) {
-  this->enable();
-  delayMicroseconds(1);
-
-  this->write_byte(0x20 | reg);  // Read command
-  this->write_byte(0x00);        // Reserved
-  uint8_t msb = this->read_byte();
-  uint8_t lsb = this->read_byte();
-
-  delayMicroseconds(1);
-  this->disable();
-  return (msb << 8) | lsb;
-}
-
-float ADS131M04::request_measurement(uint8_t channel, ADS131M04Gain gain) {
-  if (channel > 3)
-    return NAN;
-
-  // Set gain for the specified channel
-  uint16_t gain_reg = this->read_register_(ADS131M04_REG_GAIN);
-  gain_reg &= ~(0x7 << (channel * 4));  // Clear current gain
-  gain_reg |= (gain << (channel * 4));   // Set new gain
-  this->write_register_(ADS131M04_REG_GAIN, gain_reg);
-
-  // Read the data
-  this->read_data_();
-
-  // Convert based on gain and 1.2V reference
-  float scale = 1.2f / (8388608.0f * (1 << gain));
-  return scale;  // Return the scaled value
-}
-
-void ADS131M04::read_data_() {
-  this->enable();
-  delayMicroseconds(1);
-
-  // Send NULL command to read data
-  this->write_byte(ADS131M04_NULL_CMD >> 8);
-  this->write_byte(ADS131M04_NULL_CMD & 0xFF);
-
-  // Status word (2 bytes)
-  uint8_t status_msb = this->read_byte();
-  uint8_t status_lsb = this->read_byte();
-  uint16_t status = (status_msb << 8) | status_lsb;
-
-  // Read all channels (24 bits each)
-  for (int i = 0; i < 4; i++) {
-    uint32_t raw_value = 0;
-    for (int j = 0; j < 3; j++) {
-      raw_value = (raw_value << 8) | this->read_byte();
-    }
-
-    // Convert to signed 24-bit
-    int32_t value = raw_value & 0x00FFFFFF;
-    if (value & 0x800000)
-      value |= 0xFF000000;  // Sign extend
-
-    ESP_LOGVV(TAG, "Channel %d raw value: %d", i, value);
+  if (temperature_mode) {
+    // Set temperature sensor mode
+    //        0bxxxxxxxxxxx1xxxx
+    temp_config |= 0b0000000000010000;
+  } else {
+    // Set ADC mode
+    //        0bxxxxxxxxxxx0xxxx
+    temp_config &= 0b1111111111101111;
   }
 
-  delayMicroseconds(1);
-  this->disable();
-}
+  // Start conversion
+  temp_config |= 0b1000000000000000;
 
-void ADS131M04::loop() {
-  this->read_data_();
-  delay(10);  // Don't read too fast
+  this->enable();
+  this->write_byte16(temp_config);
+  this->disable();
+
+  // about 1.2 ms with 860 samples per second
+  delay(2);
+
+  this->enable();
+  uint8_t adc_first_byte = this->read_byte();
+  uint8_t adc_second_byte = this->read_byte();
+  this->disable();
+  uint16_t raw_conversion = encode_uint16(adc_first_byte, adc_second_byte);
+
+  auto signed_conversion = static_cast<int16_t>(raw_conversion);
+
+  if (temperature_mode) {
+    return (signed_conversion >> 2) * 0.03125f;
+  } else {
+    float millivolts;
+    float divider = 32768.0f;
+    switch (gain) {
+      case ADS131M04_GAIN_6P144:
+        millivolts = (signed_conversion * 6144) / divider;
+        break;
+      case ADS131M04_GAIN_4P096:
+        millivolts = (signed_conversion * 4096) / divider;
+        break;
+      case ADS131M04_GAIN_2P048:
+        millivolts = (signed_conversion * 2048) / divider;
+        break;
+      case ADS131M04_GAIN_1P024:
+        millivolts = (signed_conversion * 1024) / divider;
+        break;
+      case ADS131M04_GAIN_0P512:
+        millivolts = (signed_conversion * 512) / divider;
+        break;
+      case ADS131M04_GAIN_0P256:
+        millivolts = (signed_conversion * 256) / divider;
+        break;
+      default:
+        millivolts = NAN;
+    }
+
+    return millivolts / 1e3f;
+  }
 }
 
 }  // namespace ads131m04
