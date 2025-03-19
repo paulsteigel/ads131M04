@@ -2,8 +2,8 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome.const import (
-    //CONF_GAIN,
-    //CONF_MULTIPLEXER,
+    CONF_GAIN,
+    CONF_MULTIPLEXER,
     DEVICE_CLASS_VOLTAGE,
     STATE_CLASS_MEASUREMENT,
     UNIT_VOLT,
@@ -34,8 +34,8 @@ CONFIG_SCHEMA = cv.typed_schema(
         .extend(
             {
                 cv.GenerateID(CONF_ADS131M04_ID): cv.use_id(ADS131M04),
-                //cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, upper=True, space="_"),
-                //cv.Required(CONF_GAIN): cv.enum(GAIN, string=True),
+                cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, upper=True, space="_"),
+                cv.Required(CONF_GAIN): cv.enum(GAIN, string=True),
             }
         )
         .extend(cv.polling_component_schema("60s")),
@@ -48,3 +48,10 @@ async def to_code(config):
     var = await sensor.new_sensor(config)
     await cg.register_component(var, config)
     await cg.register_parented(var, config[CONF_ADS131M04_ID])
+    '''
+    if config[CONF_TYPE] == TYPE_ADC:
+        cg.add(var.set_multiplexer(config[CONF_MULTIPLEXER]))
+        cg.add(var.set_gain(config[CONF_GAIN]))
+    if config[CONF_TYPE] == TYPE_TEMPERATURE:
+        cg.add(var.set_temperature_mode(True))
+    '''
