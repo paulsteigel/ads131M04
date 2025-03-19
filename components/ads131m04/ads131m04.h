@@ -30,6 +30,7 @@ struct adcOutputraw{ // ADC output in two's complement
   uint32_t ch3;
 };
 
+/* removed due to fixed hardware
 enum ADS131M04Multiplexer {
   ADS131M04_MULTIPLEXER_AIN0P_AIN0N,
   ADS131M04_MULTIPLEXER_AIN1P_AIN1N,
@@ -47,6 +48,7 @@ enum ADS131M04Multiplexer {
   ADS131M04_MULTIPLEXER_DC_TEST_POS,
   ADS131M04_MULTIPLEXER_DC_TEST_NEG,
 };
+*/
 
 enum ADS131M04Gain {
   ADS131M04_GAIN_1,
