@@ -217,39 +217,55 @@ uint8_t ADS131M04::writeRegister(uint8_t address, uint16_t value) {
   uint8_t bytesRcv;
   uint16_t cmd = 0;
 
-  digitalWrite(this->cs_, LOW);
+  this->cs_->digital_write(false); // Replace digitalWrite(ADS131M04_CS_PIN, LOW)
   delayMicroseconds(1);
 
   cmd = (CMD_WRITE_REG) | (address << 7) | 0;
 
-  uint8_t tx_buffer[13];
-  uint8_t rx_buffer[13];
+  // Send the command (16 bits)
+  uint8_t cmd_high = (cmd >> 8) & 0xFF;
+  uint8_t cmd_low = cmd & 0xFF;
+  this->write_byte(cmd_high);
+  this->write_byte(cmd_low);
+  this->write_byte(0x00); // Send the extra byte
 
-  tx_buffer[0] = (cmd >> 8) & 0xFF;
-  tx_buffer[1] = cmd & 0xFF;
-  tx_buffer[2] = 0x00;
-  tx_buffer[3] = (value >> 8) & 0xFF;
-  tx_buffer[4] = value & 0xFF;
+  // Send the value (16 bits)
+  uint8_t value_high = (value >> 8) & 0xFF;
+  uint8_t value_low = value & 0xFF;
+  this->write_byte(value_high);
+  this->write_byte(value_low);
+  this->write_byte(0x00); // Send the extra byte
 
-  for(int i = 5; i < 13; i++){
-    tx_buffer[i] = 0x00;
+  // Send 16 bits of 0x0000 followed by 1 byte of 0x00, 6 times
+  for (int i = 0; i < 6; i++) {
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+    this->write_byte(0x00);
   }
-  this->transfer(tx_buffer, rx_buffer, 13);
-  res = ((uint16_t)rx_buffer[7] << 8) | rx_buffer[8];
 
-  delayMicroseconds(1);
-  digitalWrite(this->cs_, HIGH);
+  // Read the response (16 bits)
+  uint8_t res_high = this->read_byte();
+  uint8_t res_low = this->read_byte();
+  res = (res_high << 8) | res_low;
+  this->read_byte(); // Read the extra byte
+
+  // Send 16 bits of 0x0000 followed by 1 byte of 0x00, 6 times
+  for (int i = 0; i < 6; i++) {
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+  }
+
+  this->cs_->digital_write(true); // Replace digitalWrite(ADS131M04_CS_PIN, HIGH)
 
   addressRcv = (res & REGMASK_CMD_READ_REG_ADDRESS) >> 7;
   bytesRcv = (res & REGMASK_CMD_READ_REG_BYTES);
 
-  if (addressRcv == address)
-  {
+  if (addressRcv == address) {
     return bytesRcv + 1;
   }
   return 0;
 }
-// ... (setup(), dump_config(), readRegister(), writeRegister()) ...
 
 void ADS131M04::writeRegisterMasked(uint8_t address, uint16_t value, uint16_t mask) {
   uint16_t register_contents = readRegister(address);
