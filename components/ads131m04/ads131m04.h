@@ -331,7 +331,9 @@ public:
   //void set_num_ac_channels(int num_ac_channels) { num_ac_channels_ = num_ac_channels; }
   void set_data_ready_pin(GPIOPin *data_ready_pin) { this->data_ready_pin_ = data_ready_pin; }  
   void set_reset_pin(GPIOPin *reset_pin) { this->reset_pin_ = reset_pin; }  
-    
+  // Prototype for set_gain()
+  void set_gain(ADS131M04Gain gain);
+
   //void begin(uint8_t clk_pin, uint8_t miso_pin, uint8_t mosi_pin, uint8_t cs_pin, uint8_t drdy_pin, uint8_t reset_pin);
   int8_t isDataReadySoft(byte channel);
   bool isDataReady(void);
