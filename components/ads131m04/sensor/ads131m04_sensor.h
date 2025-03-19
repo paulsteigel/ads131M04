@@ -17,7 +17,7 @@ public:
   float sample(); // Removed 'override'
   void dump_config() override;
   //void set_gain(ADS131M04Gain gain) { this->gain_ = gain; }
-  ADS131M04Gain get_gain() { return this->gain_; }
+  //ADS131M04Gain get_gain() { return this->gain_; }
   void set_channel(uint8_t channel);
 
 protected:
