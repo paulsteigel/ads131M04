@@ -400,16 +400,31 @@ bool ADS131M04::setInputChannelSelection(uint8_t channel, uint8_t input) {
 }
 
 bool ADS131M04::setChannelOffsetCalibration(uint8_t channel, int32_t offset) {
-  if (channel > 3) return false;
-  uint8_t msb_reg, lsb_reg;
-  switch (channel) {
-    case 0: msb_reg = REG_CH0_OCAL_MSB; lsb_reg = REG_CH0_OCAL_LSB; break;
-    case 1: msb_reg = REG_CH1_OCAL_MSB; lsb_reg = REG_CH1_OCAL_LSB; break;
-    case 2: msb_reg = REG_CH2_OCAL_MSB; lsb_reg = REG_CH2_OCAL_LSB; break;
-    case 3: msb_reg = REG_CH3_OCAL_MSB; lsb_reg = REG_CH3_OCAL_LSB; break;
-    default: return false;
+  uint16_t MSB = offset >> 8;
+  uint8_t LSB = offset;
+  bool returnval = false;
+
+  if (channel > 3) {
+    returnval = false;
+  } else if (channel == 0) {
+    writeRegisterMasked(REG_CH0_OCAL_MSB, MSB, 0xFFFF);
+    writeRegisterMasked(REG_CH0_OCAL_LSB, LSB << 8, REGMASK_CHX_OCAL0_LSB);
+    returnval = true;
+  } else if (channel == 1) {
+    writeRegisterMasked(REG_CH1_OCAL_MSB, MSB, 0xFFFF);
+    writeRegisterMasked(REG_CH1_OCAL_LSB, LSB << 8, REGMASK_CHX_OCAL0_LSB);
+    returnval = true;
+  } else if (channel == 2) {
+    writeRegisterMasked(REG_CH2_OCAL_MSB, MSB, 0xFFFF);
+    writeRegisterMasked(REG_CH2_OCAL_LSB, LSB << 8, REGMASK_CHX_OCAL0_LSB);
+    returnval = true;
+  } else if (channel == 3) {
+    writeRegisterMasked(REG_CH3_OCAL_MSB, MSB, 0xFFFF);
+    writeRegisterMasked(REG_CH3_OCAL_LSB, LSB << 8, REGMASK_CHX_OCAL0_LSB);
+    returnval = true;
   }
-  writeRegister(msb_reg, (offset >> 8) & 0xFFFF);
-  writeRegisterMasked(lsb_reg, (offset &
+  return returnval;
+}
+
 }  // namespace ads131m04
 }  // namespace esphome
