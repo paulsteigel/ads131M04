@@ -294,9 +294,6 @@ public:
 
 protected:
   uint16_t config_{0};
-  esphome::gpio::GPIOPin *data_ready_pin_ = nullptr;
-  esphome::gpio::GPIOPin *reset_pin_ = nullptr;
-  uint16_t config_{0};
   uint8_t data_ready_pin_ = 0;
   uint8_t reset_pin_ = 0;
 
