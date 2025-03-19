@@ -1,10 +1,8 @@
 #include "ads131m04_sensor.h"
-
 #include "esphome/core/log.h"
 
 namespace esphome {
 namespace ads131m04 {
-
 static const char *const TAG = "ads131m04.sensor";
 
 void ADS131M04Sensor::dump_config() {
