@@ -48,10 +48,3 @@ async def to_code(config):
     var = await sensor.new_sensor(config)
     await cg.register_component(var, config)
     await cg.register_parented(var, config[CONF_ADS131M04_ID])
-    '''
-    if config[CONF_TYPE] == TYPE_ADC:
-        cg.add(var.set_multiplexer(config[CONF_MULTIPLEXER]))
-        cg.add(var.set_gain(config[CONF_GAIN]))
-    if config[CONF_TYPE] == TYPE_TEMPERATURE:
-        cg.add(var.set_temperature_mode(True))
-    '''
