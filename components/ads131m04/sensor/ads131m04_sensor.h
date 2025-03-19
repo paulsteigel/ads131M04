@@ -15,12 +15,12 @@ class ADS131M04Sensor : public PollingComponent,
                       public Parented<ADS131M04> {
  public:
   void update() override;
-  
+  void dump_config() override;
+
   void set_channel(uint8_t channel) { this->channel_ = channel; }
   void set_gain(ADS131M04Gain gain) { this->gain_ = gain; }
-  
+
   float sample() override;
-  void dump_config() override;
 
  protected:
   uint8_t channel_{0};  // Channel 0-3
