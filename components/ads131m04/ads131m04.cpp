@@ -14,34 +14,22 @@ void ADS131M04::setup() {
 
 /////////////////////
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04");
-  this->spi_setup();
-  
-  // SPI Pin Setup
-    this->spi_bus_ = new spi::SPIBus(this->clk_pin_, this->sdi_pin_, this->sdo_pin_); // NOLINT
-    this->clk_pin_->setup();
-    this->clk_pin_->digital_write(true);
-    this->sdo_pin_->setup();
-    this->sdi_pin_->setup();
+  this->spi_setup(); 
+  // Reset Pin Setup
+  if (this->reset_pin_ != 0) {
+      this->reset_pin_->setup();
+      this->reset_pin_->digital_write(true); // Initial high state
+      delay(10);
+      this->reset_pin_->digital_write(false);
+      delay(10);
+      this->reset_pin_->digital_write(true);
+      delay(10);
+  }
 
-    // CS Pin Setup
-    this->cs_->setup();
-    this->cs_->digital_write(true);
-
-    // Reset Pin Setup
-    if (this->reset_pin_ != 0) {
-        this->reset_pin_->setup();
-        this->reset_pin_->digital_write(true); // Initial high state
-        delay(10);
-        this->reset_pin_->digital_write(false);
-        delay(10);
-        this->reset_pin_->digital_write(true);
-        delay(10);
-    }
-
-    // DRDY Pin Setup
-    if (this->data_ready_pin_ != 0) {
-        this->data_ready_pin_->setup();
-    }
+  // DRDY Pin Setup
+  if (this->data_ready_pin_ != 0) {
+      this->data_ready_pin_->setup();
+  }
 
 
   // Example: Set OSR
