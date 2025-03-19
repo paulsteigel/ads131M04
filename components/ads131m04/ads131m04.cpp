@@ -72,20 +72,20 @@ void ADS131M04::setup() {
   //        0bxxxx000xxxxxxxxx
   this->config_ |= ADS131M04_GAIN_6P144 << 9;
   */
-// Parse the sensor id and set the gain for each channel.
   
+  // Parse the sensor id and set the gain for each channel.
   for (auto *sensor : this->sensors_) {
-    std::string sensor_id = sensor->get_id().get_name();
-    if (sensor_id == "ads131m04_channel1") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_1); // Set gain for the sensor
-    } else if (sensor_id == "ads131m04_channel2") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_2); // Set gain for the sensor
-    } else if (sensor_id == "ads131m04_channel3") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_4); // Set gain for the sensor
-    } else if (sensor_id == "ads131m04_channel4") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_8); // Set gain for the sensor
+    std::string sensor_id = sensor->get_name(); // Get sensor name directly
+    if (sensor_id == "ADS131M04 Channel 1") { // Use sensor name from yaml
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_1);
+    } else if (sensor_id == "ADS131M04 Channel 2") {
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_2);
+    } else if (sensor_id == "ADS131M04 Channel 3") {
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_4);
+    } else if (sensor_id == "ADS131M04 Channel 4") {
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_8);
     }
-  }  
+  }
   
   // Set singleshot mode
   //        0bxxxxxxx1xxxxxxxx
