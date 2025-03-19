@@ -18,24 +18,24 @@ void ADS131M04::setup() {
 
   // Pin Setup
   if (this->reset_pin_ != 0) {
-    auto reset_pin = gpio_pin_expression(this->reset_pin_);
+    esphome::gpio::GPIOPin *reset_pin = make_pin(this->reset_pin_);
     if (reset_pin != nullptr) {
-      reset_pin->setup();
-      reset_pin->digital_write(true); // Initial high state
-      delay(10);
-      reset_pin->digital_write(false);
-      delay(10);
-      reset_pin->digital_write(true);
-      delay(10);
+        reset_pin->setup();
+        reset_pin->digital_write(true); // Initial high state
+        delay(10);
+        reset_pin->digital_write(false);
+        delay(10);
+        reset_pin->digital_write(true);
+        delay(10);
     }
-  }
+}
 
-  if (this->data_ready_pin_ != 0) {
-    auto data_ready_pin = gpio_pin_expression(this->data_ready_pin_);
+if (this->data_ready_pin_ != 0) {
+    esphome::gpio::GPIOPin *data_ready_pin = make_pin(this->data_ready_pin_);
     if (data_ready_pin != nullptr) {
-      data_ready_pin->setup();
+        data_ready_pin->setup();
     }
-  }
+}
 
   // Example: Set OSR
   setOsr(OSR_1024);
