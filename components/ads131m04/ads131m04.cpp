@@ -1,6 +1,6 @@
 #include "ads131m04.h"
 #include "esphome/core/log.h"
-#include "esphome/core/hal.h"
+#include "esphome/core/application.h"
 
 namespace esphome {
 namespace ads131m04 {
@@ -14,6 +14,8 @@ void IRAM_ATTR HOT ADS131M04Component::gpio_intr(ADS131M04Component *arg) {
 void ADS131M04Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04...");
 
+  this->spi_setup();
+
   if (this->reset_pin_ != nullptr) {
     this->reset_pin_->setup();
     this->reset_pin_->digital_write(true);  // Active low reset
@@ -25,8 +27,6 @@ void ADS131M04Component::setup() {
     this->isr_pin_->setup();
     this->isr_pin_->attach_interrupt(ADS131M04Component::gpio_intr, this, FALLING);
   }
-
-  this->spi_setup();
 
   // Perform reset
   if (!this->reset_()) {
