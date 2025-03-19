@@ -60,6 +60,7 @@ CONFIG_SCHEMA = cv.typed_schema(
         .extend(
             {
                 cv.GenerateID(CONF_ADS131M04_ID): cv.use_id(ADS131M04),
+                cv.Optional(CONF_GAIN): cv.enum(GAIN, string=True),
             }
         )
         .extend(cv.polling_component_schema("60s")),
@@ -67,23 +68,8 @@ CONFIG_SCHEMA = cv.typed_schema(
     default_type=TYPE_ADC,
 )
 
-ADS131M04_SCHEMA = cv.Schema({
-    # --- Multiplexer Configuration Removed ---
-    # Removed CONF_MULTIPLEXER from the parent schema as multiplexer is fixed in hardware.
-    # cv.Optional(CONF_MULTIPLEXER): cv.enum(MUX, upper=True, space="_"),
-    # --- End Multiplexer Removal ---
-    cv.Optional(CONF_GAIN): cv.enum(GAIN, string=True),
-})
-
 async def to_code(config):
     parent = await cg.get_variable(config[CONF_ADS131M04_ID])
-
-    # --- Multiplexer Configuration Removed ---
-    # Removed multiplexer setting logic from to_code as multiplexer is fixed in hardware.
-    # if CONF_MULTIPLEXER in config:
-    #     cg.add(parent.set_multiplexer(config[CONF_MULTIPLEXER]))
-    # --- End Multiplexer Removal ---
-
     if CONF_GAIN in config:
         cg.add(parent.set_gain(config[CONF_GAIN]))
     var = await sensor.new_sensor(config)
