@@ -281,6 +281,15 @@ class ADS131M04 : public Component,
                                       spi::CLOCK_PHASE_TRAILING, spi::DATA_RATE_1MHZ> {
 public:
   ADS131M04() = default;
+  uint8_t ADS131M04_CS_PIN;
+  uint8_t ADS131M04_DRDY_PIN;
+  uint8_t ADS131M04_CLK_PIN;
+  uint8_t ADS131M04_MISO_PIN;
+  uint8_t ADS131M04_MOSI_PIN;
+  uint8_t ADS131M04_RESET_PIN;
+  adcOutput readADC(void);
+  adcOutputraw readADCraw(void);
+  
   void setup() override;
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
@@ -293,6 +302,30 @@ public:
   //void set_reset_pin(uint8_t reset_pin) { reset_pin_ = reset_pin; }      
   void set_data_ready_pin(GPIOPin *data_ready_pin) { this->data_ready_pin_ = data_ready_pin; }  
   void set_reset_pin(GPIOPin *reset_pin) { this->reset_pin_ = reset_pin; }  
+    
+  //void begin(uint8_t clk_pin, uint8_t miso_pin, uint8_t mosi_pin, uint8_t cs_pin, uint8_t drdy_pin, uint8_t reset_pin);
+  int8_t isDataReadySoft(byte channel);
+  bool isDataReady(void);
+  bool isResetStatus(void);
+  bool isLockSPI(void);
+  bool setDrdyFormat(uint8_t drdyFormat);
+  bool setDrdyStateWhenUnavailable(uint8_t drdyState);
+  bool setPowerMode(uint8_t powerMode);
+  bool setChannelEnable(uint8_t channel, uint16_t enable);
+  bool setChannelPGA(uint8_t channel, uint16_t pga);
+  void setGlobalChop(uint16_t global_chop);
+  void setGlobalChopDelay(uint16_t delay);
+  bool setInputChannelSelection(uint8_t channel, uint8_t input);
+  bool setChannelOffsetCalibration(uint8_t channel, int32_t offset);
+  bool setChannelGainCalibration(uint8_t channel, uint32_t gain);
+  bool setOsr(uint16_t osr);
+  uint16_t readRegister(uint8_t address);
+  void reset(void);
+  bool command(uint16_t cmd);
+  float convert(int32_t datain);
+  int32_t revconvert(float datain);
+  int32_t twoscom(int32_t datain);
+  int32_t revtwoscom(int32_t datain);
 
 protected:
   uint16_t config_{0};
