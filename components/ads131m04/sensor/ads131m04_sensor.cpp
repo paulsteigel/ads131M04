@@ -10,29 +10,32 @@ void ADS131M04Sensor::dump_config() {
   ESP_LOGCONFIG(TAG, "    Gain: %u", this->gain_);
 }
 
-float ADS131M04Sensor::sample() {
+ACValues ADS131M04Sensor::sample() {
   adcOutput res = this->parent_->readADC();
-  float voltage = 0.0f;
-  switch (this->channel_) { // Corrected line
-    case 0:
-      voltage = this->parent_->convert(res.ch0, this->gain_);
-      break;
-    case 1:
-      voltage = this->parent_->convert(res.ch1, this->gain_);
-      break;
-    case 2:
-      voltage = this->parent_->convert(res.ch2, this->gain_);
-      break;
-    case 3:
-      voltage = this->parent_->convert(res.ch3, this->gain_);
-      break;
-    default:
-      ESP_LOGE(TAG, "Invalid sensor number: %u", this->channel_);
-      return NAN;
-  }
-  return voltage;
+  ACValues ac_values;
+
+  // Assign channels to AC Line 1 and AC Line 2
+  int32_t current_line1_adc = res.ch0;
+  int32_t current_line2_adc = res.ch1;
+  int32_t voltage_line1_adc = res.ch2;
+  int32_t voltage_line2_adc = res.ch3;
+
+  // Convert to actual voltage and current values
+  ac_values.current = this->parent_->convert(current_line1_adc, this->gain_); //current line 1
+  ac_values.voltage = this->parent_->convert(voltage_line1_adc, this->gain_); //voltage line 1
+
+  return ac_values;
 }
 
+void ADS131M04Sensor::update() {
+  ACValues ac_values = this->sample();
+  ESP_LOGD(TAG, "'%s': Got Voltage=%fV, Current=%fA", this->get_name().c_str(), ac_values.voltage, ac_values.current);
+  // Publish voltage and current states separately
+  this->publish_state(ac_values.voltage); // Publish voltage
+  // Publish current as a separate sensor if needed.
+}
+
+/*
 void ADS131M04Sensor::update() {
   float v = this->sample();
   if (!std::isnan(v)) {
@@ -40,7 +43,7 @@ void ADS131M04Sensor::update() {
     this->publish_state(v);
   }
 }
-
+*/
 void ADS131M04Sensor::set_channel(uint8_t channel) {
   this->channel_ = channel;
 }
