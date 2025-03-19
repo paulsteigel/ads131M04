@@ -1,37 +1,38 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import spi, pins, sensor, gpio # Add gpio here
+from esphome.components import spi
 from esphome.const import CONF_ID
+from esphome import pins
 
+CODEOWNERS = ["@paulsteigel"]
+DEPENDENCIES = ["spi"]
+MULTI_CONF = True
+
+CONF_ADS131M04_ID = "ads131m04_id"
+CONF_DATA_READY_PIN = "data_ready_pin"
 CONF_RESET_PIN = "reset_pin"
-CONF_DRDY_PIN = "drdy_pin"
-CONF_SAMPLING_RATE = "sampling_rate"
-
-DEPENDENCIES = ["spi", "sensor", "gpio"] # Add gpio here
-AUTO_LOAD = ["sensor"]
 
 ads131m04_ns = cg.esphome_ns.namespace("ads131m04")
-ADS131M04Component = ads131m04_ns.class_("ADS131M04Component", cg.Component, spi.SPIDevice)
+ADS131M04 = ads131m04_ns.class_("ADS131M04", cg.Component, spi.SPIDevice)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(ADS131M04Component),
-        cv.Required(CONF_RESET_PIN): pins.gpio_output_pin_schema,
-        cv.Required(CONF_DRDY_PIN): pins.gpio_input_pin_schema,
-        cv.Optional(CONF_SAMPLING_RATE, default=16000): cv.positive_int,
+        cv.GenerateID(): cv.declare_id(ADS131M04),
+		cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
+		cv.Optional(CONF_DATA_READY_PIN): pins.gpio_input_pin_schema,
     }
-).extend(cv.COMPONENT_SCHEMA).extend(spi.spi_device_schema(cs_pin_required=True))
+).extend(spi.spi_device_schema(cs_pin_required=True))
 
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
-    await spi.register_spi_device(var, config)
+    await spi.register_spi_device(var, config)	
+	if CONF_RESET_PIN in config:
+        reset = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
+        cg.add(var.set_reset_pin(reset))
 
-    reset_pin = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
-    cg.add(var.set_reset_pin(reset_pin))
-
-    drdy_pin = await cg.gpio_pin_expression(config[CONF_DRDY_PIN])
-    cg.add(var.set_drdy_pin(drdy_pin))
-
-    cg.add(var.set_sampling_rate(config[CONF_SAMPLING_RATE]))
+	if CONF_DATA_READY_PIN in config:
+        reset = await cg.gpio_pin_expression(config[CONF_DATA_READY_PIN])
+        cg.add(var.set_data_ready_pin(reset))
+	
