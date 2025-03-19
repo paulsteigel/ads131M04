@@ -29,9 +29,9 @@ void ADS131M04::setup() {
       delay(10);
   }
   // Set channel for sensor
-  //for (uint8_t i = 0; i < this->sensors_.size(); i++) {
-  //  this->sensors_[i]->set_channel(i);
-  //}
+  for (uint8_t i = 0; i < this->sensors_.size(); i++) {
+    this->sensors_[i]->set_channel(i);
+  }
   
   // DRDY Pin Setup
   if (this->data_ready_pin_ != nullptr) {
