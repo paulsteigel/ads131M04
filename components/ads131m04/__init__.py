@@ -18,8 +18,10 @@ ADS131M04 = ads131m04_ns.class_("ADS131M04", cg.Component, spi.SPIDevice)
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(ADS131M04),
-		cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
-		cv.Optional(CONF_DATA_READY_PIN): pins.gpio_input_pin_schema,
+	cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
+	cv.Optional(CONF_DATA_READY_PIN): pins.gpio_input_pin_schema,
+	cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, upper=True, space="_"),
+	cv.Required(CONF_GAIN): cv.enum(GAIN, string=True),
     }
 ).extend(spi.spi_device_schema(cs_pin_required=True))
 
