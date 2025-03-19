@@ -12,21 +12,6 @@ from .. import ads131m04_ns, ADS131M04, CONF_ADS131M04_ID
 
 DEPENDENCIES = ["ads131m04"]
 
-# --- Multiplexer Configuration Removed ---
-# Hardware configuration has fixed differential input pairs (AIN0P/N, AIN1P/N, etc.).
-# Therefore, multiplexer switching is not required, and related code has been removed.
-# ADS131M04Multiplexer and MUX definitions are no longer needed.
-# --- End Multiplexer Removal ---
-
-# ADS131M04Multiplexer = ads131m04_ns.enum("ADS131M04Multiplexer")
-# MUX = {
-#     "AIN0P_AIN0N": ADS131M04Multiplexer.ADS131M04_MULTIPLEXER_AIN0P_AIN0N,
-#     "AIN1P_AIN1N": ADS131M04Multiplexer.ADS131M04_MULTIPLEXER_AIN1P_AIN1N,
-#     "AIN2P_AIN2N": ADS131M04Multiplexer.ADS131M04_MULTIPLEXER_AIN2P_AIN2N,
-#     "AIN3P_AIN3N": ADS131M04Multiplexer.ADS131M04_MULTIPLEXER_AIN3P_AIN3N,
-#     # ... (other multiplexer options) ...
-# }
-
 ADS131M04Gain = ads131m04_ns.enum("ADS131M04Gain")
 GAIN = {
     "1": ads131m04_ns.ADS131M04Gain.ADS131M04_GAIN_1,
