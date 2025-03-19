@@ -12,7 +12,6 @@ class ADS131M04Sensor : public PollingComponent,
                          public sensor::Sensor,
                          public Parented<ADS131M04> {
 public: 
-  //void set_multiplexer(ADS1118Multiplexer multiplexer) { this->multiplexer_ = multiplexer; }  
   void update() override;
   float sample(); // Removed 'override'
   void dump_config() override;
@@ -21,9 +20,8 @@ public:
   void set_channel(uint8_t channel);
 
 protected:
-  /** Gain setting (string). */
-  ADS131M04Gain gain_ = ADS131M04Gain::ADS131M04_GAIN_1; // Initialize with a default gain
-  //ADS131M04Gain gain_{ADS131M04_GAIN_1};
+  //ADS131M04Gain gain_ = ADS131M04Gain::ADS131M04_GAIN_1; // Initialize with a default gain
+  ADS131M04Gain gain_{ADS131M04_GAIN_1};
   uint8_t channel_; // Add channel_ member variable
 };
 
