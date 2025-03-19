@@ -62,17 +62,7 @@ void ADS131M04::setup() {
 
   // Add other initial configuration steps here
   this->config_ = 0;
-  
-  /* old ads1118 code
-  // Setup multiplexer
-  //        0bx000xxxxxxxxxxxx
-  this->config_ |= ADS131M04_MULTIPLEXER_P0_NG << 12;
     
-  // Setup Gain
-  //        0bxxxx000xxxxxxxxx
-  this->config_ |= ADS131M04_GAIN_6P144 << 9;
-  */
-  
   // Parse the sensor id and set the gain for each channel.
   for (auto *sensor : this->sensors_) {
     std::string sensor_id = sensor->get_name(); // Get sensor name directly
@@ -121,11 +111,7 @@ void ADS131M04::dump_config() {
 
 float ADS131M04::request_measurement(ADS131M04Gain gain, bool temperature_mode) {
   uint16_t temp_config = this->config_;
-
-  // Multiplexer
-  temp_config &= 0b1000111111111111;
-  temp_config |= (multiplexer & 0b111) << 12;
-
+  
   // Gain
   temp_config &= 0b1111000111111111;
   temp_config |= (gain & 0b111) << 9;
@@ -191,11 +177,7 @@ float ADS131M04::request_measurement(ADS131M04Gain gain, bool temperature_mode) 
 
 float ADS131M04::request_measurementX(ADS131M04Gain gain, bool temperature_mode) {
   uint16_t temp_config = this->config_;
-  // Multiplexer
-  //        0bxBBBxxxxxxxxxxxx
-  temp_config &= 0b1000111111111111;
-  temp_config |= (multiplexer & 0b111) << 12;
-
+  
   // Gain
   //        0bxxxxBBBxxxxxxxxx
   temp_config &= 0b1111000111111111;
