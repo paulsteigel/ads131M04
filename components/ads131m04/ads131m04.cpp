@@ -1,5 +1,6 @@
 #include "ads131m04.h"
 #include "esphome/core/log.h"
+#include "sensor/ads131m04_sensor.h" // Include the sensor header file
 //#include "esphome/core/helpers.h" // For encoding and decoding functions
 //#include "esphome/components/gpio/gpio.h" // For GPIO pin handling
 //#include "esphome/core/application.h" // For delay functions
@@ -71,20 +72,20 @@ void ADS131M04::setup() {
   //        0bxxxx000xxxxxxxxx
   this->config_ |= ADS131M04_GAIN_6P144 << 9;
   */
+// Parse the sensor id and set the gain for each channel.
   
-  // Parse the sensor id and set the gain for each channel.
   for (auto *sensor : this->sensors_) {
     std::string sensor_id = sensor->get_id().get_name();
     if (sensor_id == "ads131m04_channel1") {
-      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_1); // Example gain
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_1); // Set gain for the sensor
     } else if (sensor_id == "ads131m04_channel2") {
-      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_2); // Example gain
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_2); // Set gain for the sensor
     } else if (sensor_id == "ads131m04_channel3") {
-      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_4); // Example gain
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_4); // Set gain for the sensor
     } else if (sensor_id == "ads131m04_channel4") {
-      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_8); // Example gain
+      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_8); // Set gain for the sensor
     }
-  }
+  }  
   
   // Set singleshot mode
   //        0bxxxxxxx1xxxxxxxx
