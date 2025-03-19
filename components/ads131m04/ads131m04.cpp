@@ -23,7 +23,7 @@ void ADS131M04::setup() {
   this->cs_->setup();
   this->cs_->digital_write(true);
   
-  this->spi_setup();
+  //this->spi_setup();
   
   // Reset Pin Setup   
   if (this->reset_pin_ != nullptr) {
