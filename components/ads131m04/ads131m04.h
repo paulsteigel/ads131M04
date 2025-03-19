@@ -1,24 +1,36 @@
 #pragma once
 
-#include "esphome/core/component.h"
 #include "esphome/components/spi/spi.h"
+#include "esphome/core/component.h"
+#include "esphome/core/hal.h"
 #include "esphome/components/sensor/sensor.h"
 
 namespace esphome {
 namespace ads131m04 {
 
-// ADS131M04 Commands (16-bit)
+// Commands
 static const uint16_t ADS131M04_NULL_CMD = 0x0000;
 static const uint16_t ADS131M04_RESET = 0x0011;
+static const uint16_t ADS131M04_STANDBY = 0x0022;
+static const uint16_t ADS131M04_WAKEUP = 0x0033;
 static const uint16_t ADS131M04_LOCK = 0x0555;
 static const uint16_t ADS131M04_UNLOCK = 0x0655;
 
-// ADS131M04 Registers
+// Registers
 static const uint8_t ADS131M04_REG_ID = 0x00;
 static const uint8_t ADS131M04_REG_STATUS = 0x01;
 static const uint8_t ADS131M04_REG_MODE = 0x02;
+static const uint8_t ADS131M04_REG_CLOCK = 0x03;
+static const uint8_t ADS131M04_REG_GAIN = 0x04;
 
-class ADS131M04 : public Component, public spi::SPIDevice {
+// Register masks
+static const uint16_t ADS131M04_MODE_RESET = 0x0040;
+static const uint16_t ADS131M04_MODE_WAKEUP = 0x0020;
+static const uint16_t ADS131M04_MODE_CONTINUOUS = 0x0100;
+
+class ADS131M04 : public Component,
+                public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_LOW, spi::CLOCK_PHASE_TRAILING,
+                                      spi::DATA_RATE_1MHZ> {
  public:
   void setup() override;
   void dump_config() override;
@@ -45,8 +57,8 @@ class ADS131M04 : public Component, public spi::SPIDevice {
   sensor::Sensor *voltage_sensors_[4] = {nullptr, nullptr, nullptr, nullptr};
   sensor::Sensor *current_sensors_[4] = {nullptr, nullptr, nullptr, nullptr};
 
-  // Calibration factors
-  static constexpr float VOLTAGE_SCALE = 2.048f / 8388608.0f;  // 2.048V reference / 2^23
+  // Calibration factors for voltage and current measurements
+  static constexpr float VOLTAGE_SCALE = 1.2f / 8388608.0f;  // 1.2V reference / 2^23
   static constexpr float CURRENT_SCALE = VOLTAGE_SCALE / 100.0f;  // Assuming 0.01Ω shunt
 };
 
