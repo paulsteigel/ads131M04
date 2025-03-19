@@ -1,87 +1,62 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, binary_sensor
+from esphome.components import sensor
 from esphome.const import (
-    CONF_ID,
-    CONF_UPDATE_INTERVAL,
-    UNIT_VOLT,
-    UNIT_AMPERE,
-    ICON_FLASH,
+    CONF_GAIN,
+    DEVICE_CLASS_VOLTAGE,
     STATE_CLASS_MEASUREMENT,
+    UNIT_VOLT,
+    CONF_TYPE,
 )
+from .. import ads131m04_ns, ADS131M04, CONF_ADS131M04_ID
 
-DEPENDENCIES = ["spi"]
-AUTO_LOAD = ["binary_sensor"]
+DEPENDENCIES = ["ads131m04"]
 
-CONF_ADS131M04_ID = "ads131m04_id"
-CONF_GAIN = "gain"
-CONF_VOLTAGE_OFFSET = "voltage_offset"
-CONF_VOLTAGE_SCALE = "voltage_scale"
-CONF_CURRENT_OFFSET = "current_offset"
-CONF_CURRENT_SCALE = "current_scale"
-
-ads131m04_ns = cg.esphome_ns.namespace("ads131m04")
-ADS131M04 = ads131m04_ns.class_("ADS131M04", cg.PollingComponent, spi.SPIDevice)
-ADS131M04Gain = ads131m04_ns.enum_("ADS131M04Gain")
-
-GAINS = {
+ADS131M04Gain = ads131m04_ns.enum("ADS131M04Gain")
+GAIN = {
     "1": ADS131M04Gain.ADS131M04_GAIN_1,
     "2": ADS131M04Gain.ADS131M04_GAIN_2,
     "4": ADS131M04Gain.ADS131M04_GAIN_4,
-    "8": ADS131M0骖04Gain.ADS131M04_GAIN_8,
+    "8": ADS131M04Gain.ADS131M04_GAIN_8,
     "16": ADS131M04Gain.ADS131M04_GAIN_16,
     "32": ADS131M04Gain.ADS131M04_GAIN_32,
     "64": ADS131M04Gain.ADS131M04_GAIN_64,
     "128": ADS131M04Gain.ADS131M04_GAIN_128,
 }
 
-ADS131M04Sensor = ads131m04_ns.class_("ADS131M04Sensor", sensor.Sensor, cg.Parented.template(ADS131M04))
-
-CONFIG_SCHEMA = (
-    cv.Schema(
-        {
-            cv.GenerateID(): cv.declare_id(ADS131M04),
-        }
-    )
-    .extend(cv.polling_component_schema("60s"))
-    .extend(spi.spi_device_schema())
+ADS131M04Sensor = ads131m04_ns.class_(
+    "ADS131M04Sensor",
+    cg.PollingComponent,
+    sensor.Sensor,
+    cg.Parented.template(ADS131M04),
 )
 
-ADS131M04_SENSOR_SCHEMA = sensor.sensor_schema(
-    unit_of_measurement=UNIT_VOLT,
-    icon=ICON_FLASH,
-    accuracy_decimals=3,
-    state_class=STATE_CLASS_MEASUREMENT,
-).extend(
+TYPE_ADC = "adc"
+
+CONFIG_SCHEMA = cv.typed_schema(
     {
-        cv.GenerateID(CONF_ADS131M04_ID): cv.use_id(ADS131M04),
-        cv.Optional(CONF_GAIN, default="1"): cv.enum(GAINS, upper=True),
-        cv.Optional(CONF_VOLTAGE_OFFSET, default=0.0): cv.float_,
-        cv.Optional(CONF_VOLTAGE_SCALE, default=1.0): cv.float_,
-        cv.Optional(CONF_CURRENT_OFFSET, default=0.0): cv.float_,
-        cv.Optional(CONF_CURRENT_SCALE, default=1.0): cv.float_,
-    }
+        TYPE_ADC: sensor.sensor_schema(
+            ADS131M04Sensor,
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=3,
+            device_class=DEVICE_CLASS_VOLTAGE,
+            state_class=STATE_CLASS_MEASUREMENT,
+        )
+        .extend(
+            {
+                cv.GenerateID(CONF_ADS131M04_ID): cv.use_id(ADS131M04),
+                cv.Optional(CONF_GAIN): cv.enum(GAIN, string=True),
+            }
+        )
+        .extend(cv.polling_component_schema("60s")),
+    },
+    default_type=TYPE_ADC,
 )
 
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID])
+    var = await sensor.new_sensor(config)
     await cg.register_component(var, config)
-
-async def to_code_sensor(config):
-    var = cg.new_Pvariable(config[CONF_ID], template_args=(cg.RawExpression("float"),))
-    await cg.register_component(var, config)
-    parent = await cg.get_variable(config[CONF_ADS131M04_ID])
-    cg.add(var.set_parent(parent))
+    await cg.register_parented(var, config[CONF_ADS131M04_ID])
 
     if CONF_GAIN in config:
         cg.add(var.set_gain(config[CONF_GAIN]))
-    if CONF_VOLTAGE_OFFSET in config:
-        cg.add(var.set_voltage_offset(config[CONF_VOLTAGE_OFFSET]))
-    if CONF_VOLTAGE_SCALE in config:
-        cg.add(var.set_voltage_scale(config[CONF_VOLTAGE_SCALE]))
-    if CONF_CURRENT_OFFSET in config:
-        cg.add(var.set_current_offset(config[CONF_CURRENT_OFFSET]))
-    if CONF_CURRENT_SCALE in config:
-        cg.add(var.set_current_scale(config[CONF_CURRENT_SCALE]))
-
-    cg.add_library("math.h", "")
