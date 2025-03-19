@@ -20,17 +20,18 @@ CONF_RESET_PIN = "reset_pin"
 CONF_DRDY_PIN = "drdy_pin"
 CONF_SAMPLING_RATE = "sampling_rate"
 
+# Default values
 DEFAULT_SAMPLING_RATE = 16000  # Hz
 
 ads131m04_ns = cg.esphome_ns.namespace('ads131m04')
-ADS131M04Component = ads131m04_ns.class_('ADS131M04Component', cg.Component, spi.SPIDevice)
+ADS131M04 = ads131m04_ns.class_('ADS131M04', cg.Component, spi.SPIDevice)
 
 CHANNEL_CONFIG = cv.Schema({
     cv.Required(CONF_CHANNEL): cv.int_range(min=1, max=4),
 })
 
 CONFIG_SCHEMA = cv.Schema({
-    cv.GenerateID(): cv.declare_id(ADS131M04Component),
+    cv.GenerateID(): cv.declare_id(ADS131M04),
     cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
     cv.Optional(CONF_DRDY_PIN): pins.gpio_input_pin_schema,
     cv.Optional(CONF_SAMPLING_RATE, default=DEFAULT_SAMPLING_RATE): cv.int_range(min=1000, max=32000),
