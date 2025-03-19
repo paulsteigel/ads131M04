@@ -7,14 +7,12 @@ namespace ads131m04 {
 
 static const char *const TAG = "ads131m04";
 
-void IRAM_ATTR HOT ADS131M04Component::gpio_intr(ADS131M04Component *arg) {
+void IRAM_ATTR HOT ADS131M04::gpio_intr(ADS131M04 *arg) {
   arg->data_ready_ = true;
 }
 
-void ADS131M04Component::setup() {
+void ADS131M04::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04...");
-
-  this->spi_setup();
 
   if (this->reset_pin_ != nullptr) {
     this->reset_pin_->setup();
@@ -24,8 +22,7 @@ void ADS131M04Component::setup() {
   if (this->drdy_pin_ != nullptr) {
     this->drdy_pin_->setup();
     this->isr_pin_ = new ISRInternalGPIOPin(this->drdy_pin_);
-    this->isr_pin_->setup();
-    this->isr_pin_->attach_interrupt(ADS131M04Component::gpio_intr, this, FALLING);
+    this->isr_pin_->attach_interrupt(ADS131M04::gpio_intr, this, FALLING);
   }
 
   // Perform reset
@@ -55,7 +52,7 @@ void ADS131M04Component::setup() {
   }
 }
 
-void ADS131M04Component::dump_config() {
+void ADS131M04::dump_config() {
   ESP_LOGCONFIG(TAG, "ADS131M04:");
   LOG_PIN("  Reset Pin: ", this->reset_pin_);
   LOG_PIN("  DRDY Pin: ", this->drdy_pin_);
@@ -77,7 +74,7 @@ void ADS131M04Component::dump_config() {
   }
 }
 
-bool ADS131M04Component::write_register_(uint8_t reg, uint16_t value) {
+bool ADS131M04::write_register_(uint8_t reg, uint16_t value) {
   ESP_LOGVV(TAG, "Writing register 0x%02X = 0x%04X", reg, value);
 
   this->enable();
@@ -90,7 +87,7 @@ bool ADS131M04Component::write_register_(uint8_t reg, uint16_t value) {
   return true;
 }
 
-uint16_t ADS131M04Component::read_register_(uint8_t reg) {
+uint16_t ADS131M04::read_register_(uint8_t reg) {
   this->enable();
   this->write_byte(0x20 | reg);  // Read command
   this->write_byte(0x00);        // Reserved
@@ -104,7 +101,7 @@ uint16_t ADS131M04Component::read_register_(uint8_t reg) {
   return value;
 }
 
-void ADS131M04Component::read_data_() {
+void ADS131M04::read_data_() {
   uint8_t data[16];  // 4 bytes per channel
 
   this->enable();
@@ -131,7 +128,7 @@ void ADS131M04Component::read_data_() {
   }
 }
 
-bool ADS131M04Component::reset_() {
+bool ADS131M04::reset_() {
   ESP_LOGD(TAG, "Resetting ADS131M04");
 
   if (this->reset_pin_ != nullptr) {
@@ -152,7 +149,7 @@ bool ADS131M04Component::reset_() {
   return true;
 }
 
-bool ADS131M04Component::init_() {
+bool ADS131M04::init_() {
   ESP_LOGD(TAG, "Initializing ADS131M04");
 
   // Unlock registers
@@ -176,7 +173,7 @@ bool ADS131M04Component::init_() {
   return true;
 }
 
-void ADS131M04Component::loop() {
+void ADS131M04::loop() {
   if (this->is_failed())
     return;
 
