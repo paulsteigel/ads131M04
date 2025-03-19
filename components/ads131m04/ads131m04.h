@@ -2,10 +2,8 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
-#include "esphome/core/log.h"
-#include "esphome/core/polling_component.h"
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/spi/spi.h"
+#include "esphome/components/sensor/sensor.h"
 
 namespace esphome {
 namespace ads131m04 {
