@@ -8,17 +8,6 @@
 namespace esphome {
 namespace ads131m04 {
 
-enum ADS131M04Gain {
-  ADS131M04_GAIN_1,
-  ADS131M04_GAIN_2,
-  ADS131M04_GAIN_4,
-  ADS131M04_GAIN_8,
-  ADS131M04_GAIN_16,
-  ADS131M04_GAIN_32,
-  ADS131M04_GAIN_64,
-  ADS131M04_GAIN_128,
-};
-
 class ADS131M04Sensor : public PollingComponent,
                          public sensor::Sensor,
                          public Parented<ADS131M04> {
