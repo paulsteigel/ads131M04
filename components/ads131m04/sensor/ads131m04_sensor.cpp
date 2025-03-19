@@ -19,6 +19,7 @@ float ADS131M04Sensor::sample() {
 }
 */
 float ADS131M04Sensor::sample() {
+  float voltage = 0.0f;
   /*
   adcOutput res = this->parent_->readADC();
   float voltage = 0.0f;
@@ -36,10 +37,10 @@ float ADS131M04Sensor::sample() {
       voltage = this->parent_->convert(res.ch3, gain_);
       break;
     default:
-      ESP_LOGE(TAG, "Invalid sensor number: %u", sensor_num_);
-      */
+      ESP_LOGE(TAG, "Invalid sensor number: %u", sensor_num_);      
       return NAN;
   }
+  */
   return voltage;
 }
 
