@@ -14,7 +14,7 @@ void ADS131M04Sensor::dump_config() {
 }
 
 float ADS131M04Sensor::sample() {
-  return this->parent_->request_measurement(this->multiplexer_, this->gain_, this->temperature_mode_);
+  //return this->parent_->readADC(this->multiplexer_, this->gain_, this->temperature_mode_);
 }
 
 void ADS131M04Sensor::update() {
