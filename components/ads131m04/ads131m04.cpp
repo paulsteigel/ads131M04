@@ -61,11 +61,12 @@ void ADS131M04::setup() {
 
   // Add other initial configuration steps here
   this->config_ = 0;
+  
+  /* old ads1118 code
   // Setup multiplexer
   //        0bx000xxxxxxxxxxxx
   this->config_ |= ADS131M04_MULTIPLEXER_P0_NG << 12;
-  
-  /* old ads1118 code
+    
   // Setup Gain
   //        0bxxxx000xxxxxxxxx
   this->config_ |= ADS131M04_GAIN_6P144 << 9;
