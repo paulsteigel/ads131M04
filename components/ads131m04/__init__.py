@@ -27,10 +27,9 @@ async def to_code(config):
     await cg.register_component(var, config)
     await spi.register_spi_device(var, config)	
 	if CONF_RESET_PIN in config:
-        reset = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
-        cg.add(var.set_reset_pin(reset))
+	        reset = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
+	        cg.add(var.set_reset_pin(reset))
 
 	if CONF_DRDY_PIN in config:
-        reset = await cg.gpio_pin_expression(config[CONF_DRDY_PIN])
-        cg.add(var.set_data_ready_pin(reset))
-	
+	        reset = await cg.gpio_pin_expression(config[CONF_DRDY_PIN])
+	        cg.add(var.set_data_ready_pin(reset))
