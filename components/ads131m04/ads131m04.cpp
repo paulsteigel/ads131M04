@@ -1,6 +1,6 @@
 #include "ads131m04.h"
 #include "esphome/core/log.h"
-#include "sensor/ads131m04_sensor.h" // Include the sensor header file
+//#include "sensor/ads131m04_sensor.h" // Include the sensor header file
 //#include "esphome/core/helpers.h" // For encoding and decoding functions
 //#include "esphome/components/gpio/gpio.h" // For GPIO pin handling
 //#include "esphome/core/application.h" // For delay functions
@@ -10,10 +10,6 @@ namespace ads131m04 {
 
 static const char *const TAG = "ads131m04";
 static const uint8_t ADS131M04_DATA_RATE_860_SPS = 0b111;
-
-void ADS131M04::set_gain(ADS131M04Gain gain) {
-  this->gain_ = gain;
-}
 
 void ADS131M04::setup() {
 
@@ -62,20 +58,6 @@ void ADS131M04::setup() {
 
   // Add other initial configuration steps here
   this->config_ = 0;
-    
-  // Parse the sensor id and set the gain for each channel.
-  for (auto *sensor : this->sensors_) {
-    std::string sensor_id = sensor->get_name(); // Get sensor name directly
-    if (sensor_id == "ADS131M04 Channel 1") { // Use sensor name from yaml
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_1);
-    } else if (sensor_id == "ADS131M04 Channel 2") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_2);
-    } else if (sensor_id == "ADS131M04 Channel 3") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_4);
-    } else if (sensor_id == "ADS131M04 Channel 4") {
-      sensor->set_gain(ADS131M04Gain::ADS131M04_GAIN_8);
-    }
-  }
   
   // Set singleshot mode
   //        0bxxxxxxx1xxxxxxxx
@@ -108,6 +90,7 @@ void ADS131M04::dump_config() {
   LOG_PIN("  DRDY Pin:", this->data_ready_pin_);
   LOG_PIN("  RESET Pin:", this->reset_pin_);
 }
+
 /*
 float ADS131M04::request_measurement(ADS131M04Gain gain, bool temperature_mode) {
   uint16_t temp_config = this->config_;
