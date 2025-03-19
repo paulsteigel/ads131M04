@@ -10,6 +10,10 @@ namespace ads131m04 {
 static const char *const TAG = "ads131m04";
 static const uint8_t ADS131M04_DATA_RATE_860_SPS = 0b111;
 
+void ADS131M04::set_gain(ADS131M04Gain gain) {
+  this->gain_ = gain;
+}
+
 void ADS131M04::setup() {
 
 /////////////////////
@@ -56,17 +60,31 @@ void ADS131M04::setup() {
   setInputChannelSelection(0, INPUT_CHANNEL_MUX_AIN0P_AIN0N);
 
   // Add other initial configuration steps here
-
-
   this->config_ = 0;
   // Setup multiplexer
   //        0bx000xxxxxxxxxxxx
   this->config_ |= ADS131M04_MULTIPLEXER_P0_NG << 12;
-
+  
+  /* old ads1118 code
   // Setup Gain
   //        0bxxxx000xxxxxxxxx
   this->config_ |= ADS131M04_GAIN_6P144 << 9;
-
+  */
+  
+  // Parse the sensor id and set the gain for each channel.
+  for (auto *sensor : this->sensors_) {
+    std::string sensor_id = sensor->get_id().get_name();
+    if (sensor_id == "ads131m04_channel1") {
+      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_1); // Example gain
+    } else if (sensor_id == "ads131m04_channel2") {
+      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_2); // Example gain
+    } else if (sensor_id == "ads131m04_channel3") {
+      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_4); // Example gain
+    } else if (sensor_id == "ads131m04_channel4") {
+      this->set_gain(ADS131M04Gain::ADS131M04_GAIN_8); // Example gain
+    }
+  }
+  
   // Set singleshot mode
   //        0bxxxxxxx1xxxxxxxx
   this->config_ |= 0b0000000100000000;
