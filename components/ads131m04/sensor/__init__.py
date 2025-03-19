@@ -12,7 +12,7 @@ from esphome.const import (
 from .. import ads131m04_ns, ADS131M04, CONF_ADS131M04_ID
 
 DEPENDENCIES = ["ads131m04"]
-// remove enum for multiplexer and gain and move to parent component.
+''' remove enum for multiplexer and gain and move to parent component.
 ADS131M04Sensor = ads131m04_ns.class_(
     "ADS131M04Sensor",
     cg.PollingComponent,
