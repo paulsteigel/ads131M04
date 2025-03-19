@@ -15,27 +15,34 @@ void ADS131M04::setup() {
 /////////////////////
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04");
   this->spi_setup();
+  
+  // SPI Pin Setup
+    this->spi_bus_ = new spi::SPIBus(this->clk_pin_, this->sdi_pin_, this->sdo_pin_); // NOLINT
+    this->clk_pin_->setup();
+    this->clk_pin_->digital_write(true);
+    this->sdo_pin_->setup();
+    this->sdi_pin_->setup();
 
-  // Pin Setup
+    // CS Pin Setup
+    this->cs_->setup();
+    this->cs_->digital_write(true);
+
+    // Reset Pin Setup
     if (this->reset_pin_ != 0) {
-        esphome::gpio::GPIOPin *reset_pin = new esphome::gpio::GPIOPin();
-        reset_pin->set_pin(this->reset_pin_);
-        reset_pin->setup();
-        reset_pin->digital_write(true); // Initial high state
+        this->reset_pin_->setup();
+        this->reset_pin_->digital_write(true); // Initial high state
         delay(10);
-        reset_pin->digital_write(false);
+        this->reset_pin_->digital_write(false);
         delay(10);
-        reset_pin->digital_write(true);
+        this->reset_pin_->digital_write(true);
         delay(10);
-        delete reset_pin;
     }
 
+    // DRDY Pin Setup
     if (this->data_ready_pin_ != 0) {
-        esphome::gpio::GPIOPin *data_ready_pin = new esphome::gpio::GPIOPin();
-        data_ready_pin->set_pin(this->data_ready_pin_);
-        data_ready_pin->setup();
-        delete data_ready_pin;
+        this->data_ready_pin_->setup();
     }
+
 
   // Example: Set OSR
   setOsr(OSR_1024);
