@@ -22,10 +22,10 @@ public:
   void dump_config() override;
   void set_gain(ADS131M04Gain gain) { this->gain_ = gain; }
   void set_channel(uint8_t channel);
-  id set_voltage_offset(float offset);
-  void set_voltage_scale(float scale);
-  void set_current_offset(float offset);
-  void set_current_scale(float scale);
+  void set_voltage_offset(float offset); // Corrected return type
+  void set_voltage_scale(float scale); // Corrected return type
+  void set_current_offset(float offset); // Corrected return type
+  void set_current_scale(float scale); // Corrected return type
 
 protected:
   float calculateRMS(const int32_t* samples, int numSamples, float offset, float scale);
