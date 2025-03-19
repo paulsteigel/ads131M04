@@ -1,34 +1,52 @@
 #pragma once
 
-#include "esphome/core/component.h"
-#include "esphome/core/preferences.h"
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/spi/spi.h"
-//#include "esphome/components/gpio/gpio.h"
+#include "esphome/core/component.h"
+#include "esphome/core/hal.h"
 
 namespace esphome {
 namespace ads131m04 {
 
-// Commands (16-bit)
-static const uint16_t ADS131M04_NULL_CMD = 0x0000;
-static const uint16_t ADS131M04_RESET = 0x0011;
-static const uint16_t ADS131M04_STANDBY = 0x0022;
-static const uint16_t ADS131M04_WAKEUP = 0x0033;
-static const uint16_t ADS131M04_LOCK = 0x0555;
-static const uint16_t ADS131M04_UNLOCK = 0x0655;
+enum ADS131M04Multiplexer {
+  ADS131M04_MULTIPLEXER_P0_N1 = 0b000,
+  ADS131M04_MULTIPLEXER_P0_N3 = 0b001,
+  ADS131M04_MULTIPLEXER_P1_N3 = 0b010,
+  ADS131M04_MULTIPLEXER_P2_N3 = 0b011,
+  ADS131M04_MULTIPLEXER_P0_NG = 0b100,
+  ADS131M04_MULTIPLEXER_P1_NG = 0b101,
+  ADS131M04_MULTIPLEXER_P2_NG = 0b110,
+  ADS131M04_MULTIPLEXER_P3_NG = 0b111,
+};
 
-// Registers
-static const uint8_t ADS131M04_REG_ID = 0x00;
-static const uint8_t ADS131M04_REG_STATUS = 0x01;
-static const uint8_t ADS131M04_REG_MODE = 0x02;
-static const uint8_t ADS131M04_REG_CLOCK = 0x03;
+enum ADS131M04Gain {
+  ADS131M04_GAIN_6P144 = 0b000,
+  ADS131M04_GAIN_4P096 = 0b001,
+  ADS131M04_GAIN_2P048 = 0b010,
+  ADS131M04_GAIN_1P024 = 0b011,
+  ADS131M04_GAIN_0P512 = 0b100,
+  ADS131M04_GAIN_0P256 = 0b101,
+};
 
-// Register values
-static const uint16_t ADS131M04_MODE_CONTINUOUS = 0x0100;
-
-class ADS131M04Component : public Component, public spi::SPIDevice {
-public:
+class ADS131M04 : public Component,
+                public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_LOW, spi::CLOCK_PHASE_TRAILING,
+                                      spi::DATA_RATE_1MHZ> {
+ public:
+  ADS131M04() = default;
   void setup() override;
   void dump_config() override;
-  void loop() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
+  /// Helper method to request a measurement from a sensor.
+  float request_measurement(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode);
+  
+  //void set_num_ac_channels(int num_ac_channels) { num_ac_channels_ = num_ac_channels; }
+  void set_data_ready_pin(uint8_t data_ready_pin) { data_ready_pin_ = data_ready_pin; }
+  void set_reset_pin(uint8_t reset_pin) { reset_pin_ = reset_pin; }
+  	
+ protected:
+  uint16_t config_{0};
+  uint8_t data_ready_pin_ = 0;
+  uint8_t reset_pin_ = 0;
+};
+
+}  // namespace ads131m04
+}  // namespace esphome
