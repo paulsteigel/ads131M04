@@ -25,7 +25,7 @@ static const uint8_t ADS131M04_REG_CLOCK = 0x03;
 // Register values
 static const uint16_t ADS131M04_MODE_CONTINUOUS = 0x0100;
 
-class ADS131M04Component : public Component, public spi::SPIDevice {
+class ADS131M04 : public Component, public spi::SPIDevice {
  public:
   void setup() override;
   void dump_config() override;
@@ -49,7 +49,7 @@ class ADS131M04Component : public Component, public spi::SPIDevice {
   }
 
  protected:
-  static void gpio_intr(ADS131M04Component *arg);
+  static void gpio_intr(ADS131M04 *arg);
 
   bool write_register_(uint8_t reg, uint16_t value);
   uint16_t read_register_(uint8_t reg);
