@@ -22,8 +22,8 @@ public:
 
 protected:
   /** Gain setting (string). */
-  //ADS131M04Gain gain_ = ADS131M04Gain::ADS131M04_GAIN_1; // Initialize with a default gain
-  ADS131M04Gain gain_{ADS131M04_GAIN_1};
+  ADS131M04Gain gain_ = ADS131M04Gain::ADS131M04_GAIN_1; // Initialize with a default gain
+  //ADS131M04Gain gain_{ADS131M04_GAIN_1};
   uint8_t channel_; // Add channel_ member variable
 };
 
