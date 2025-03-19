@@ -1,12 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import spi
-from esphome.components import sensor
-from esphome.const import (
-	CONF_ID,
-	CONF_GAIN,
-    	CONF_MULTIPLEXER,
-)    
+from esphome.const import CONF_ID 
 from esphome import pins
 
 CODEOWNERS = ["@paulsteigel"]
@@ -25,8 +20,6 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(ADS131M04),
 	cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
 	cv.Optional(CONF_DATA_READY_PIN): pins.gpio_input_pin_schema,
-	cv.Required(CONF_MULTIPLEXER): cv.enum(MUX, upper=True, space="_"),
-	cv.Required(CONF_GAIN): cv.enum(GAIN, string=True),
     }
 ).extend(spi.spi_device_schema(cs_pin_required=True))
 
