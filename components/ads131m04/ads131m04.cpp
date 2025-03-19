@@ -8,6 +8,13 @@ static const char *const TAG = "ads131m04";
 
 void ADS131M04::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ADS131M04...");
+
+  if (this->reset_pin_ != nullptr) {
+    this->reset_pin_->setup();
+    this->reset_pin_->digital_write(true);
+    this->reset_();
+  }
+
   this->spi_setup();
 
   // Read and verify device ID
@@ -31,11 +38,23 @@ void ADS131M04::setup() {
 void ADS131M04::dump_config() {
   ESP_LOGCONFIG(TAG, "ADS131M04:");
   LOG_PIN("  CS Pin:", this->cs_);
+  LOG_PIN("  Reset Pin:", this->reset_pin_);
 
   if (this->is_failed()) {
     ESP_LOGE(TAG, "Communication failed!");
     return;
   }
+}
+
+void ADS131M04::reset_() {
+  if (this->reset_pin_ == nullptr)
+    return;
+
+  ESP_LOGD(TAG, "Performing hardware reset");
+  this->reset_pin_->digital_write(false);
+  delay(10);  // Hold reset low for 10ms
+  this->reset_pin_->digital_write(true);
+  delay(10);  // Wait for 10ms after reset
 }
 
 bool ADS131M04::write_register_(uint8_t reg, uint16_t value) {
