@@ -1,144 +1,57 @@
-#include "ads131m04.h"
-#include "esphome/core/log.h"
+#pragma once
+
+#include "esphome/components/spi/spi.h"
+#include "esphome/core/component.h"
+#include "esphome/core/hal.h"
 
 namespace esphome {
 namespace ads131m04 {
 
-static const char *const TAG = "ads131m04";
+// Commands (from Pico implementation)
+static const uint16_t ADS131M04_NULL_CMD = 0x0000;
+static const uint16_t ADS131M04_RESET = 0x0011;
+static const uint16_t ADS131M04_STANDBY = 0x0022;
+static const uint16_t ADS131M04_WAKEUP = 0x0033;
+static const uint16_t ADS131M04_LOCK = 0x0555;
+static const uint16_t ADS131M04_UNLOCK = 0x0655;
 
-void ADS131M04::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up ADS131M04...");
+// Registers
+static const uint8_t ADS131M04_REG_ID = 0x00;
+static const uint8_t ADS131M04_REG_STATUS = 0x01;
+static const uint8_t ADS131M04_REG_MODE = 0x02;
+static const uint8_t ADS131M04_REG_CLOCK = 0x03;
+static const uint8_t ADS131M04_REG_GAIN = 0x04;
+static const uint8_t ADS131M04_REG_CFG = 0x06;
 
-  if (this->reset_pin_ != nullptr) {
-    this->reset_pin_->setup();
-    this->reset_pin_->digital_write(true);
-    this->reset_();
-  }
+enum ADS131M04Gain {
+  ADS131M04_GAIN_1 = 0b000,
+  ADS131M04_GAIN_2 = 0b001,
+  ADS131M04_GAIN_4 = 0b010,
+  ADS131M04_GAIN_8 = 0b011,
+  ADS131M04_GAIN_16 = 0b100,
+  ADS131M04_GAIN_32 = 0b101,
+  ADS131M04_GAIN_64 = 0b110,
+  ADS131M04_GAIN_128 = 0b111,
+};
 
-  this->spi_setup();
+class ADS131M04 : public Component,
+                public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_LOW, spi::CLOCK_PHASE_TRAILING,
+                                      spi::DATA_RATE_8MHZ> {
+ public:
+  ADS131M04() = default;
+  void setup() override;
+  void dump_config() override;
+  float get_setup_priority() const override { return setup_priority::DATA; }
 
-  // Read and verify device ID
-  uint16_t id = this->read_register_(ADS131M04_REG_ID);
-  ESP_LOGD(TAG, "Device ID: 0x%04X", id);
+  // Helper method to read measurements
+  float request_measurement(uint8_t channel, ADS131M04Gain gain);
 
-  if ((id & 0xFF00) != 0x4000) {
-    ESP_LOGE(TAG, "Invalid device ID!");
-    this->mark_failed();
-    return;
-  }
-
-  // Configure device for continuous conversion
-  if (!this->write_register_(ADS131M04_REG_MODE, ADS131M04_MODE_CONTINUOUS)) {
-    ESP_LOGE(TAG, "Failed to configure MODE register");
-    this->mark_failed();
-    return;
-  }
-}
-
-void ADS131M04::dump_config() {
-  ESP_LOGCONFIG(TAG, "ADS131M04:");
-  LOG_PIN("  CS Pin:", this->cs_);
-  LOG_PIN("  Reset Pin:", this->reset_pin_);
-
-  if (this->is_failed()) {
-    ESP_LOGE(TAG, "Communication failed!");
-    return;
-  }
-}
-
-void ADS131M04::reset_() {
-  if (this->reset_pin_ == nullptr)
-    return;
-
-  ESP_LOGD(TAG, "Performing hardware reset");
-  this->reset_pin_->digital_write(false);
-  delay(10);  // Hold reset low for 10ms
-  this->reset_pin_->digital_write(true);
-  delay(10);  // Wait for 10ms after reset
-}
-
-bool ADS131M04::write_register_(uint8_t reg, uint16_t value) {
-  this->enable();
-  delayMicroseconds(1);
-
-  // SPI frame structure from Pico implementation
-  this->write_byte(0x40 | reg);  // Write command
-  this->write_byte(0x00);        // Reserved
-  this->write_byte((value >> 8) & 0xFF);
-  this->write_byte(value & 0xFF);
-
-  delayMicroseconds(1);
-  this->disable();
-  return true;
-}
-
-uint16_t ADS131M04::read_register_(uint8_t reg) {
-  this->enable();
-  delayMicroseconds(1);
-
-  this->write_byte(0x20 | reg);  // Read command
-  this->write_byte(0x00);        // Reserved
-  uint8_t msb = this->read_byte();
-  uint8_t lsb = this->read_byte();
-
-  delayMicroseconds(1);
-  this->disable();
-  return (msb << 8) | lsb;
-}
-
-void ADS131M04::read_data_() {
-  uint8_t data[16];  // 4 bytes per channel
-
-  this->enable();
-  delayMicroseconds(1);
-
-  // Send NULL command to read data
-  this->write_byte(ADS131M04_NULL_CMD >> 8);
-  this->write_byte(ADS131M04_NULL_CMD & 0xFF);
-
-  // Status word - 2 bytes
-  uint8_t status_msb = this->read_byte();
-  uint8_t status_lsb = this->read_byte();
-  uint16_t status = (status_msb << 8) | status_lsb;
-
-  // Read channel data (4 bytes per channel)
-  for (int i = 0; i < 4; i++) {
-    data[i*4] = this->read_byte();
-    data[i*4+1] = this->read_byte();
-    data[i*4+2] = this->read_byte();
-    data[i*4+3] = this->read_byte();
-  }
-
-  delayMicroseconds(1);
-  this->disable();
-
-  // Process channel data
-  for (int i = 0; i < 4; i++) {
-    int32_t raw_value = (data[i*4] << 24) | (data[i*4+1] << 16) | (data[i*4+2] << 8) | data[i*4+3];
-
-    // Two's complement conversion (if bit 23 is set)
-    if (raw_value & 0x800000) {
-      raw_value -= 0x1000000;
-    }
-
-    if (this->voltage_sensors_[i] != nullptr) {
-      float voltage = raw_value * VOLTAGE_SCALE;
-      this->voltage_sensors_[i]->publish_state(voltage);
-    }
-
-    if (this->current_sensors_[i] != nullptr) {
-      float current = raw_value * CURRENT_SCALE;
-      this->current_sensors_[i]->publish_state(current);
-    }
-  }
-}
-
-void ADS131M04::loop() {
-  if (this->is_failed())
-    return;
-
-  this->read_data_();
-}
+ protected:
+  bool write_register_(uint8_t reg, uint16_t value);
+  uint16_t read_register_(uint8_t reg);
+  void read_data_();
+  uint16_t config_{0};
+};
 
 }  // namespace ads131m04
 }  // namespace esphome
