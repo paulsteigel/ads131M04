@@ -118,7 +118,7 @@ void ADS131M04::dump_config() {
   LOG_PIN("  RESET Pin:", this->reset_pin_);
 }
 
-float ADS131M04::request_measurement(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode) {
+float ADS131M04::request_measurement(ADS131M04Gain gain, bool temperature_mode) {
   uint16_t temp_config = this->config_;
 
   // Multiplexer
@@ -188,7 +188,7 @@ float ADS131M04::request_measurement(ADS131M04Multiplexer multiplexer, ADS131M04
   return millivolts / 1e3f;
 }
 
-float ADS131M04::request_measurementX(ADS131M04Multiplexer multiplexer, ADS131M04Gain gain, bool temperature_mode) {
+float ADS131M04::request_measurementX(ADS131M04Gain gain, bool temperature_mode) {
   uint16_t temp_config = this->config_;
   // Multiplexer
   //        0bxBBBxxxxxxxxxxxx
