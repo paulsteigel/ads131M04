@@ -178,7 +178,7 @@ uint16_t ADS131M04::readRegister(uint8_t address) {
   for (int i=2; i<13; i++){
     tx_buffer[i] = 0x00;
   }
-  this->spi_->transfer(tx_buffer, rx_buffer, 13); // Corrected: Use spi_bus_->transfer()
+  this->transfer(tx_buffer, rx_buffer, 13); // Corrected: Use spi_bus_->transfer()
   data = ((uint16_t)rx_buffer[7] << 8) | rx_buffer[8];
 
   delayMicroseconds(1);
