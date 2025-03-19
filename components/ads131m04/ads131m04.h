@@ -329,10 +329,11 @@ public:
   float convert(int32_t datain);
   int32_t revconvert(float datain);
   int32_t twoscom(int32_t datain);
-  int32_t revtwoscom(int32_t datain);  
-  int32_t ADS131M04::revconvert(float datain, ADS131M04Gain gain) {
-  float ADS131M04::convert(int32_t datain, ADS131M04Gain gain) {
-  
+  int32_t revtwoscom(int32_t datain);
+
+  float convert(int32_t datain, ADS131M04Gain gain);
+  int32_t revconvert(float datain, ADS131M04Gain gain);
+
 protected:
   uint16_t config_{0};
   GPIOPin *data_ready_pin_{nullptr};  
