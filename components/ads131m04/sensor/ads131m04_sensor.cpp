@@ -13,21 +13,21 @@ void ADS131M04Sensor::dump_config() {
 float ADS131M04Sensor::sample() {
   adcOutput res = this->parent_->readADC();
   float voltage = 0.0f;
-  switch (sensor_num_) {
+  switch (this->channel_) { // Corrected line
+    case 0:
+      voltage = this->parent_->convert(res.ch0, this->gain_);
+      break;
     case 1:
-      voltage = this->parent_->convert(res.ch0, gain_);
+      voltage = this->parent_->convert(res.ch1, this->gain_);
       break;
     case 2:
-      voltage = this->parent_->convert(res.ch1, gain_);
+      voltage = this->parent_->convert(res.ch2, this->gain_);
       break;
     case 3:
-      voltage = this->parent_->convert(res.ch2, gain_);
-      break;
-    case 4:
-      voltage = this->parent_->convert(res.ch3, gain_);
+      voltage = this->parent_->convert(res.ch3, this->gain_);
       break;
     default:
-      ESP_LOGE(TAG, "Invalid sensor number: %u", sensor_num_);      
+      ESP_LOGE(TAG, "Invalid sensor number: %u", this->channel_);
       return NAN;
   }
   return voltage;
