@@ -18,14 +18,13 @@ public:
   void update() override;
   float sample(); // Removed 'override'
   void dump_config() override;
+  void set_gain(ADS131M04Gain gain) { this->gain_ = gain; }
+  ADS131M04Gain get_gain() { return this->gain_; }
 
 protected:
-  /** Sensor number (1-4). */
-  uint8_t sensor_num_;
-  /** Multiplexer setting (string). */
-  std::string multiplexer_;
   /** Gain setting (string). */
-  std::string gain_;
+  //std::string gain_;
+  ADS131M04Gain gain_;
 };
 
 }  // namespace ads131m04
