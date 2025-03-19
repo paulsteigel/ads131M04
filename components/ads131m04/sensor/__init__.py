@@ -1,26 +1,24 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import spi, sensor, binary_sensor, gpio
+from esphome.components import sensor, binary_sensor
 from esphome.const import (
     CONF_ID,
-    CONF_SPI_ID,
-    CONF_CS_PIN,
-    CONF_GAIN,
     CONF_UPDATE_INTERVAL,
     UNIT_VOLT,
     UNIT_AMPERE,
     ICON_FLASH,
     STATE_CLASS_MEASUREMENT,
-    CONF_VOLTAGE_OFFSET,
-    CONF_VOLTAGE_SCALE,
-    CONF_CURRENT_OFFSET,
-    CONF_CURRENT_SCALE,
 )
 
 DEPENDENCIES = ["spi"]
 AUTO_LOAD = ["binary_sensor"]
 
 CONF_ADS131M04_ID = "ads131m04_id"
+CONF_GAIN = "gain"
+CONF_VOLTAGE_OFFSET = "voltage_offset"
+CONF_VOLTAGE_SCALE = "voltage_scale"
+CONF_CURRENT_OFFSET = "current_offset"
+CONF_CURRENT_SCALE = "current_scale"
 
 ads131m04_ns = cg.esphome_ns.namespace("ads131m04")
 ADS131M04 = ads131m04_ns.class_("ADS131M04", cg.PollingComponent, spi.SPIDevice)
@@ -30,7 +28,7 @@ GAINS = {
     "1": ADS131M04Gain.ADS131M04_GAIN_1,
     "2": ADS131M04Gain.ADS131M04_GAIN_2,
     "4": ADS131M04Gain.ADS131M04_GAIN_4,
-    "8": ADS131M04Gain.ADS131M04_GAIN_8,
+    "8": ADS131M0骖04Gain.ADS131M04_GAIN_8,
     "16": ADS131M04Gain.ADS131M04_GAIN_16,
     "32": ADS131M04Gain.ADS131M04_GAIN_32,
     "64": ADS131M04Gain.ADS131M04_GAIN_64,
@@ -43,8 +41,6 @@ CONFIG_SCHEMA = (
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(ADS131M04),
-            cv.GenerateID(CONF_SPI_ID): cv.use_id(spi.SPIDevice),
-            cv.Required(CONF_CS_PIN): gpio.output_pin_schema,
         }
     )
     .extend(cv.polling_component_schema("60s"))
@@ -70,11 +66,6 @@ ADS131M04_SENSOR_SCHEMA = sensor.sensor_schema(
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
-    await spi.register_spi_device(var, config)
-
-    if CONF_CS_PIN in config:
-        pin = await cg.gpio_pin_expression(config[CONF_CS_PIN])
-        cg.add(var.set_cs_pin(pin))
 
 async def to_code_sensor(config):
     var = cg.new_Pvariable(config[CONF_ID], template_args=(cg.RawExpression("float"),))
