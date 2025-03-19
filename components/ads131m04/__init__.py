@@ -4,7 +4,7 @@ from esphome.components import spi
 from esphome.const import (
 	CONF_ID,
 	CONF_GAIN,
-    	CONF_MULTIPLEXER
+    	CONF_MULTIPLEXER,
 )    
 from esphome import pins
 
