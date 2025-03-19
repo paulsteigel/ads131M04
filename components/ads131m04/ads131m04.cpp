@@ -275,20 +275,25 @@ void ADS131M04::writeRegisterMasked(uint8_t address, uint16_t value, uint16_t ma
 }
 
 bool ADS131M04::command(uint16_t cmd) {
-  digitalWrite(this->cs_, LOW);
+  // Issue command (6 word frame)
+  this->cs_->digital_write(false); // Replace digitalWrite(ADS131M04_CS_PIN, LOW)
   delayMicroseconds(1);
 
-  uint8_t tx_buffer[13];
-  for (int i=0; i<13; i++){
-    tx_buffer[i] = 0x00;
+  // Send the command (16 bits)
+  uint8_t cmd_high = (cmd >> 8) & 0xFF;
+  uint8_t cmd_low = cmd & 0xFF;
+  this->write_byte(cmd_high);
+  this->write_byte(cmd_low);
+  this->write_byte(0x00); // Send the extra byte
+
+  // Send 16 bits of 0x0000 followed by 1 byte of 0x00, 5 times
+  for (int i = 0; i < 5; i++) {
+    this->write_byte(0x00);
+    this->write_byte(0x00);
+    this->write_byte(0x00);
   }
-  tx_buffer[0] = (cmd >> 8) & 0xFF;
-  tx_buffer[1] = cmd & 0xFF;
 
-  this->transfer(tx_buffer, nullptr, 13);
-
-  delayMicroseconds(1);
-  digitalWrite(this->cs_, HIGH);
+  this->cs_->digital_write(true); // Replace digitalWrite(ADS131M04_CS_PIN, HIGH)
   return true;
 }
 
