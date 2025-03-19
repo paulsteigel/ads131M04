@@ -31,9 +31,7 @@ public:
         gain_(gain) {}
 
   void update() override;
-
-  float sample() override;
-
+  float sample(); // Removed 'override'
   void dump_config() override;
 
 protected:
