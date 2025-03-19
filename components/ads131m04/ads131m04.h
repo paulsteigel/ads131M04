@@ -4,7 +4,7 @@
 #include "esphome/core/preferences.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/spi/spi.h"
-#include "esphome/components/gpio/gpio.h"
+//#include "esphome/components/gpio/gpio.h"
 
 namespace esphome {
 namespace ads131m04 {
