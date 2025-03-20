@@ -11,6 +11,12 @@ from esphome.const import (
 from .. import ads131m04_ns, ADS131M04, CONF_ADS131M04_ID
 
 DEPENDENCIES = ["ads131m04"]
+CONF_CHANNEL = "reading_channel"
+CONF_VOLTAGE_OFFSET = "voltage_offset"
+CONF_VOLTAGE_SCALE = "voltage_scale"
+CONF_CURRENT_OFFSET = "current_offset"
+CONF_CURRENT_SCALE = "current_scale"
+CONF_WINDOW_SIZE = "window_size"
 
 ADS131M04Gain = ads131m04_ns.enum("ADS131M04Gain")
 GAIN = {
@@ -46,6 +52,11 @@ CONFIG_SCHEMA = cv.typed_schema(
             {
                 cv.GenerateID(CONF_ADS131M04_ID): cv.use_id(ADS131M04),
                 cv.Optional(CONF_GAIN): cv.enum(GAIN, string=True),
+                cv.Optional(CONF_CHANNEL, default=1): cv.int_,
+                cv.Optional(CONF_VOLTAGE_OFFSET, default=0.0): cv.float_,
+                cv.Optional(CONF_VOLTAGE_SCALE, default=1.0): cv.float_,
+                cv.Optional(CONF_CURRENT_OFFSET, default=0.0): cv.float_,
+                cv.Optional(CONF_CURRENT_SCALE, default=1.0): cv.float_,
             }
         )
         .extend(cv.polling_component_schema("60s")),
@@ -57,6 +68,16 @@ async def to_code(config):
     var = await sensor.new_sensor(config)
     await cg.register_component(var, config)
     await cg.register_parented(var, config[CONF_ADS131M04_ID])
+    if CONF_VOLTAGE_OFFSET in config:
+        cg.add(var.set_voltage_offset(config[CONF_VOLTAGE_OFFSET]))
+    if CONF_VOLTAGE_SCALE in config:
+        cg.add(var.set_voltage_scale(config[CONF_VOLTAGE_SCALE]))
+    if CONF_CURRENT_OFFSET in config:
+        cg.add(var.set_current_offset(config[CONF_CURRENT_OFFSET]))
+    if CONF_CURRENT_SCALE in config:
+        cg.add(var.set_current_scale(config[CONF_CURRENT_SCALE]))
+
+    cg.add_library("math.h", "")
 
     if CONF_GAIN in config:
         cg.add(var.set_gain(config[CONF_GAIN]))
