@@ -62,11 +62,7 @@ void ADS131M04::setup() {
   // Set data rate - 860 samples per second (we're in singleshot mode)
   //        0bxxxxxxxx100xxxxx
   this->config_ |= ADS131M04_DATA_RATE_860_SPS << 5;
-
-  // Set temperature sensor mode - ADC
-  //        0bxxxxxxxxxxx0xxxx
-  this->config_ |= 0b0000000000000000;
-
+  
   // Set DOUT pull up - enable
   //        0bxxxxxxxxxxxx0xxx
   this->config_ |= 0b0000000000001000;
