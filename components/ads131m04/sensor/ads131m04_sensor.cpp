@@ -49,7 +49,8 @@ float ADS131M04Sensor::calculateRMS(const int32_t* samples, int numSamples, floa
 }
 
 void ADS131M04Sensor::update() {
-  //ACValues ac_values = this->sample();
+  /*
+    ACValues ac_values = this->sample();
   ESP_LOGD(TAG, "'%s': Got Voltage=%fV, Current=%fA", this->get_name().c_str(), ac_values.voltage, ac_values.current);
   this->publish_state(ac_values.voltage);
 
@@ -63,6 +64,7 @@ void ADS131M04Sensor::update() {
   } else {
     this->set_update_interval(1000); // Longer interval if voltage is stable
   }
+  */
 }
 
 void ADS131M04Sensor::set_channel(uint8_t channel) {
