@@ -3,7 +3,7 @@
 #include "esphome/components/spi/spi.h"
 #include "esphome/core/component.h"
 #include "esphome/core/hal.h"
-#include <vector> // Include vector header
+//#include <vector> // Include vector header
 
 namespace esphome {
 namespace ads131m04 {
@@ -339,7 +339,7 @@ protected:
   GPIOPin *data_ready_pin_{nullptr};  
   GPIOPin *reset_pin_{nullptr};
   //ADS131M04Gain gain_; // Declare gain_ here
-  std::vector<class ADS131M04Sensor *> sensors_; // Declare sensors_ here
+  //std::vector<class ADS131M04Sensor *> sensors_; // Declare sensors_ here
 
 private:
     //uint16_t readRegister(uint8_t address);
